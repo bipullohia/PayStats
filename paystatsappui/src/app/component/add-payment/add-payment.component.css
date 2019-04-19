@@ -1,0 +1,9 @@
+.heading-border{
+    border-style: solid !important;
+    border-width:  0px 0px 3px 0px !important;
+}
+
+.img-add{
+    width: 26px !important;
+    height: 26px !important;
+}

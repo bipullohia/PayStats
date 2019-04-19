@@ -1,0 +1,98 @@
+<div class="container">
+  <div class="mb-4 mt-4 border-bottom border-dark heading-border row clearfix">
+    <h4 class="float-left">All Payments </h4>
+    <div class="float-right">
+      <img [src]="gridViewLogo" class="img-icon mr-2 img-thumbnail" />
+      <img [src]="listViewLogo" class="img-icon img-thumbnail" />
+    </div>
+  </div>
+  <div class="card-columns mb-4">
+    <div class="card p-3" *ngFor="let p of payments; index as i" (mouseover)="cf.hidden=false; nomouse.hidden=true; mouse.hidden=false"
+      (mouseleave)="cf.hidden=true; nomouse.hidden=false; mouse.hidden=true">
+
+      <div class="clearfix">
+        <h6 class="card-title float-left">
+          <div #nomouse>{{p.title | adjustLength:40}}</div>
+          <div #mouse hidden="true">{{p.title | adjustLength:30}}</div>
+        </h6>
+        <div class="float-right">
+          <div hidden="true" #cf>
+
+            <a (click)="viewDetails(detailsModal, p, i)">
+              <img [src]="detailLogo" class="img-thumbnail img-icon" data-toggle="tooltip" data-placement="bottom"
+                title="View Payment Details" />
+            </a>
+
+            <a routerLink="/editPayment/{{p.payid}}">
+              <img [src]="editLogo" class="img-thumbnail ml-2 img-icon" data-toggle="tooltip" data-placement="bottom"
+                title="Edit this Payment" />
+            </a>
+
+            <a (click)="deleteModal(modal, p, i)">
+              <img [src]="garbageLogo" class="img-thumbnail ml-2 img-icon" data-toggle="tooltip" data-placement="bottom"
+                title="Delete this Payment" />
+            </a>
+
+          </div>
+        </div>
+      </div>
+      <div>
+        <div>
+          Amount: {{p.amount | currency: 'INR' :'symbol': '1.0-1'}}
+        </div>
+        <div>
+          Paid on: {{p.dateOfTransaction | date}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #modal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Deletion Confirmation</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Payment record once deleted cannot be retreived. It will also change the relevant calculations.</p>
+    <p>Payment Title: {{paymentSelected.title}}
+      <br>Amount Paid: {{paymentSelected.amount | currency: 'INR' : 'symbol' : '1.2-2'}}</p>
+    <p><strong>Are you sure you want to delete it?</strong></p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" (click)="modalRef.hide()">Cancel</button>
+    <button class="btn btn-danger" (click)="deletePayment(); modalRef.hide()">Delete</button>
+  </div>
+</ng-template>
+
+
+<ng-template #detailsModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left ml-3">Payment Details</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="detailsModalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body ml-3 mr-3">
+    <p>Payment Id: {{paymentSelected.payid}}</p>
+    <p><strong>Payment Title: {{paymentSelected.title}}</strong></p>
+    <p>Payment Description: {{paymentSelected.description}}</p>
+    <p><strong>Amount Paid: {{paymentSelected.amount | currency: 'INR' : 'symbol' : '1.2-2'}}</strong></p>
+    <p><strong>Date of Transaction: {{paymentSelected.dateOfTransaction | date : 'longDate'}}</strong></p>
+    <p>Paid To: {{paymentSelected.entityPaidTo}}</p>
+    <p>Payment Category: {{paymentSelected.paymentCategory}}</p>
+    <p>Payment Type: {{paymentSelected.payType}}</p>
+    <p *ngIf="paymentSelected.payType!='Cash'">Payment Entity: {{paymentSelected.paymentEntity}}</p>
+    <p class="text-muted" style="font-size: 14px;">Edited on {{paymentSelected.timestamp | date : 'medium'}}</p>
+    <p></p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-info" routerLink="/editPayment/{{paymentSelected.payid}}" (click)="detailsModalRef.hide()">Edit</button>
+    <button class="btn btn-danger" (click)="deleteModal(modal, paymentSelected, indexSelected); detailsModalRef.hide()">Delete</button>
+  </div>
+</ng-template>
+
+
+<lib-ngx-notification></lib-ngx-notification>
