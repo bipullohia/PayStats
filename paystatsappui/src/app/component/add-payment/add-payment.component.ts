@@ -28,10 +28,21 @@ export class AddPaymentComponent implements OnInit {
     this.isEditing = false;
 
     this.loadExistingPayment();
-    
+    if(!this.isEditing){
+      
+      this.payment.dateOfTransaction = this.getCurrentDate();
+    }
   }
 
-  loadExistingPayment(){
+  getCurrentDate(){
+    let date = new Date();
+    let day = (date.getDate()<10 ? "0"+date.getDate() : date.getDate());
+    let month = (date.getMonth()<10 ? "0"+(date.getMonth()+1) : (date.getMonth()+1));
+    let dateString = date.getFullYear() + "-" + month + "-" + day;
+    return dateString;
+  }
+
+  loadExistingPayment() {
     this.activatedRoute.params.subscribe(
       (params) => {
         let pid = params['id'];
@@ -52,7 +63,7 @@ export class AddPaymentComponent implements OnInit {
     // console.log("Save pressed. Paytype: "+ this.payment.payType);
     // console.log(this.payment.title + "1");
     this.payment.title = this.payment.title.charAt(0).toUpperCase() + this.payment.title.substr(1, this.payment.title.length);
-    if(this.payment.description == null || this.payment.description == ""){
+    if (this.payment.description == null || this.payment.description == "") {
       this.payment.description = this.payment.title;
     }
     //console.log(this.payment.title + "2");
@@ -79,11 +90,11 @@ export class AddPaymentComponent implements OnInit {
     this.router.navigateByUrl("/listPayments/all");
   }
 
-  setDefaultValues(){
+  setDefaultValues() {
     this.loadExistingPayment();
   }
 
-  resetValues(){
+  resetValues() {
     this.payment = new Payment;
   }
 }
