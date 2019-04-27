@@ -25,6 +25,7 @@ listViewLogo: string;
   modalRef: BsModalRef;
   detailsModalRef: BsModalRef;
 
+  isGridView: boolean;
   constructor(private paymentService: PaymentService,
     private activatedRoute: ActivatedRoute,
     private modalService: BsModalService,
@@ -39,10 +40,17 @@ listViewLogo: string;
 
 
   ngOnInit() {
+    this.isGridView = true;
     this.getAllPayments();
   }
     
-
+  changeView(viewType: string){
+    if(viewType=="list"){
+      this.isGridView = false;
+    }else{
+      this.isGridView = true;
+    }
+  }
 
     //this.isEditing = false;
 
