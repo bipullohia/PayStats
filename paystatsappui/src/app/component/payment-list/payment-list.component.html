@@ -1,19 +1,32 @@
-<div class="container">
+<div class="container mt-2">
   <div class="mb-4 mt-4 border-bottom border-dark heading-border  clearfix">
     <h4 class="float-left">All Payments </h4>
-    <div class="float-right">
-      <img [src]="gridViewLogo" class="img-icon mr-2 img-thumbnail" (click)="changeView('grid')"  
-        data-toggle="tooltip" data-placement="bottom" title="Show as Grid" />
-      <img [src]="listViewLogo" class="img-icon img-thumbnail" (click)="changeView('list')"
-        data-toggle="tooltip" data-placement="bottom" title="Show as List" />
+    <div class="float-right mb-2">
+      <button class="btn btn-outline-info mr-3" (click)="applyFilters(filtersModal)">Apply Filters</button>
+      <div class="btn-group" dropdown>
+        <button id="button-basic" dropdownToggle type="button" class="btn btn-outline-info dropdown-toggle"
+          aria-controls="dropdown-basic">
+          Sort By <span class="caret"></span>
+        </button>
+        <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+          <li role="menuitem"><a class="dropdown-item">Date: Most Recent</a></li>
+          <li role="menuitem"><a class="dropdown-item">Date: As Added</a></li>
+          <li role="menuitem"><a class="dropdown-item">Amount: Low to High</a></li>
+          <li role="menuitem"><a class="dropdown-item">Amount: High to Low</a></li>
+          
+        </ul>
+      </div>
+      <img [src]="gridViewLogo" class="img-icon mr-2 ml-3 img-thumbnail" (click)="changeView('grid')" data-toggle="tooltip"
+        data-placement="bottom" title="Show as Grid" />
+      <img [src]="listViewLogo" class="img-icon img-thumbnail" (click)="changeView('list')" data-toggle="tooltip"
+        data-placement="bottom" title="Show as List" />
     </div>
   </div>
   <div class="card-columns mb-4" *ngIf="isGridView">
     <div class="card p-3" *ngFor="let p of payments; index as i"
       (mouseover)="cf.hidden=false; nomouse.hidden=true; mouse.hidden=false"
-      (mouseleave)="cf.hidden=true; nomouse.hidden=false; mouse.hidden=true"
-      >
-<!-- [ngClass]="{
+      (mouseleave)="cf.hidden=true; nomouse.hidden=false; mouse.hidden=true">
+      <!-- [ngClass]="{
         'border-primary': p.paymentCategory=='Transport',
         'border-secondary': (p.paymentCategory=='Flat Amenities' || p.paymentCategory=='Stationary'),
         'border-success': p.paymentCategory=='Food',
@@ -60,23 +73,24 @@
   </div>
   <div class="mb-4" *ngIf="!isGridView">
     <ul class="list-group">
-      <li class="list-group-item" *ngFor="let p of payments; index as i"
-        (mouseover)="cf.hidden=false; nomouse.hidden=true; mouse.hidden=false"
-        (mouseleave)="cf.hidden=true; nomouse.hidden=false; mouse.hidden=true">
-        
+      <li class="list-group-item" *ngFor="let p of payments; index as i" (mouseover)="cf.hidden=false; ts.hidden=true"
+        (mouseleave)="cf.hidden=true; ts.hidden=false">
+
         <span class="font-weight-bold mr-2">{{p.title | adjustLength:50}}</span>
         <span class="mr-2 ml-2">|</span>
         <span class="mr-2 ml-2">{{p.description | adjustLength:50}}</span>
         <span class="mr-2 ml-2">|</span>
-        <span class="mr-2 ml-2">Paid <span class="font-weight-bold">{{p.amount | currency: 'INR' :'symbol': '1.0-1'}}</span>
-           on {{p.dateOfTransaction | date}} by {{p.payType}}</span>
+        <span class="mr-2 ml-2">Paid <span
+            class="font-weight-bold">{{p.amount | currency: 'INR' :'symbol': '1.0-1'}}</span>
+          on {{p.dateOfTransaction | date}} by {{p.payType}}</span>
         <!-- <span class="mr-2 ml-2">|</span>
         <span class="mr-2 ml-2">Paid on: {{p.dateOfTransaction | date}}</span> -->
 
 
 
         <div class="float-right row">
-          <span class="text-muted font-weight-lighter mr-3" style="font-size: 14px;">Edited on {{p.timestamp | date : 'EEE, dd MMM'}}</span>
+          <span class="text-muted font-weight-lighter mr-3" style="font-size: 12px;" #ts>Edited on
+            {{p.timestamp | date : 'EEE, dd MMM'}}</span>
           <div hidden="true" #cf>
 
             <a (click)="viewDetails(detailsModal, p, i)">
@@ -150,6 +164,24 @@
       (click)="detailsModalRef.hide()">Edit</button>
     <button class="btn btn-danger"
       (click)="deleteModal(modal, paymentSelected, indexSelected); detailsModalRef.hide()">Delete</button>
+  </div>
+</ng-template>
+
+<ng-template #filtersModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left ml-3">Apply Filters</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="filtersModalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+  </div> 
+  <div class="modal-body ml-3 mr-3">
+    <p>Oh, Hello there!</p>
+  </div>
+  <div class="modal-footer">
+      <button class="btn btn-info" routerLink="/editPayment/{{paymentSelected.payid}}"
+      (click)="filtersModalRef.hide()">Reset</button>
+    <button class="btn btn-danger"
+      (click)="deleteModal(modal, paymentSelected, indexSelected); filtersModalRef.hide()">Apply</button>
   </div>
 </ng-template>
 

@@ -24,6 +24,7 @@ listViewLogo: string;
 
   modalRef: BsModalRef;
   detailsModalRef: BsModalRef;
+  filtersModalRef: BsModalRef;
 
   isGridView: boolean;
   constructor(private paymentService: PaymentService,
@@ -97,6 +98,10 @@ listViewLogo: string;
     this.detailsModalRef = this.modalService.show(template);
     this.paymentSelected = payment;
     this.indexSelected = index;
+  }
+
+  applyFilters(template: TemplateRef<any>){
+    this.filtersModalRef = this.modalService.show(template);
   }
 
   deletePayment(){

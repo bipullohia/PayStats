@@ -10,14 +10,17 @@ import { PaymentListComponent } from './component/payment-list/payment-list.comp
 import { AddPaymentComponent } from './component/add-payment/add-payment.component';
 
 import { NgxNotificationComponent } from 'ngx-notification';
-import {ModalModule} from 'ngx-bootstrap/modal';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { AdjustLengthPipe } from './pipe/adjust-length.pipe';
+import { ManageComponent } from './component/manage/manage.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'listPayments/all', component: PaymentListComponent},
   {path: 'listPayments/:category', component: PaymentListComponent},
-  {path:'addPayment',component:AddPaymentComponent}, 
+  {path:'addPayment',component:AddPaymentComponent},
+  {path:'manage/:option',component:ManageComponent},  
   {path:'editPayment/:id',component:AddPaymentComponent},
   {path:'deletePayment/:id',component:HomeComponent}
 ];
@@ -29,13 +32,15 @@ const routes: Routes = [
     PaymentListComponent,
     AddPaymentComponent,
     NgxNotificationComponent,
-    AdjustLengthPipe
+    AdjustLengthPipe,
+    ManageComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
     RouterModule.forRoot(routes),
+    BsDropdownModule.forRoot(),
     ModalModule.forRoot()
   ],
   providers: [],
