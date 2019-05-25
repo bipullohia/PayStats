@@ -22,6 +22,8 @@ export class PaymentListComponent implements OnInit {
   gridViewLogo: string;
   listViewLogo: string;
 
+  sortingApplied: string;
+
   modalRef: BsModalRef;
   detailsModalRef: BsModalRef;
   filtersModalRef: BsModalRef;
@@ -41,8 +43,10 @@ export class PaymentListComponent implements OnInit {
 
 
   ngOnInit() {
-    this.isGridView = true;
+    this.isGridView = false;
     this.getAllPayments();
+    this.sortArray("mostRecentPaymentFirst");
+    //this.payments.
   }
 
   changeView(viewType: string) {
@@ -86,6 +90,39 @@ export class PaymentListComponent implements OnInit {
         this.payments = data;
       }
     );
+  }
+
+  sortArray(sortType: string) {
+
+    switch (sortType) {
+
+      case "mostRecentPaymentFirst":
+        this.sortingApplied = "Most Recent Payment First";
+        this.payments = this.payments.sort((n1, n2) => new Date(n2.dateOfTransaction).getTime() - new Date(n1.dateOfTransaction).getTime());
+        break;
+
+      case "oldestPaymentFirst":
+        this.sortingApplied = "Oldest Payment First";
+        this.payments = this.payments.sort((n1, n2) => new Date(n1.dateOfTransaction).getTime() - new Date(n2.dateOfTransaction).getTime());
+        break;
+
+      case "paymentAmountLowToHigh":
+        this.sortingApplied = "Payment Amount: Low to High";
+        this.payments = this.payments.sort((n1, n2) => n1.amount - n2.amount);
+        break;
+
+      case "paymentAmountHighToLow":
+        this.sortingApplied = "Payment Amount: High to Low";
+        this.payments = this.payments.sort((n1, n2) => n2.amount - n1.amount);
+        break;
+
+      case "recentlyAddedPayment":
+        this.sortingApplied = "Recently Added Payment";
+        this.payments = this.payments.sort((n1, n2) => new Date(n2.timestamp).getTime() - new Date(n1.timestamp).getTime());
+        break;
+
+      default: console.log("default");
+    }
   }
 
   deleteModal(template: TemplateRef<any>, payment: Payment, index: number) {
