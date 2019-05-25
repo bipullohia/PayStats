@@ -59,14 +59,10 @@ export class AddPaymentComponent implements OnInit {
   }
 
   save() {
-    // console.log("Save pressed. Title: "+ this.payment.title);
-    // console.log("Save pressed. Paytype: "+ this.payment.payType);
-    // console.log(this.payment.title + "1");
     this.payment.title = this.payment.title.charAt(0).toUpperCase() + this.payment.title.substr(1, this.payment.title.length);
     if (this.payment.description == null || this.payment.description == "") {
       this.payment.description = this.payment.title;
     }
-    //console.log(this.payment.title + "2");
     if (this.isEditing) {
       this.paymentService.updatePayment(this.payment).subscribe(
         (data) => {

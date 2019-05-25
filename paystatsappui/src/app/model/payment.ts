@@ -10,10 +10,3 @@ export class Payment {
     paymentEntity:string;
     entityPaidTo:string;
 }
-
-export class Entities {
-    eid:number;
-    ename:string;
-    category:string;
-    description:string;
-}

@@ -13,14 +13,18 @@ import { NgxNotificationComponent } from 'ngx-notification';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { AdjustLengthPipe } from './pipe/adjust-length.pipe';
-import { ManageComponent } from './component/manage/manage.component';
+import { PaymentEntityComponent } from './component/manage/payment-entity/payment-entity.component';
+import { PaymentModeComponent } from './component/manage/payment-mode/payment-mode.component';
+import { PaymentCategoryComponent } from './component/manage/payment-category/payment-category.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'listPayments/all', component: PaymentListComponent},
   {path: 'listPayments/:category', component: PaymentListComponent},
   {path:'addPayment',component:AddPaymentComponent},
-  {path:'manage/:option',component:ManageComponent},  
+  {path:'manage/paymentEntities',component:PaymentEntityComponent},  
+  {path:'manage/paymentCategories',component:PaymentCategoryComponent},  
+  {path:'manage/paymentModes',component:PaymentModeComponent},  
   {path:'editPayment/:id',component:AddPaymentComponent},
   {path:'deletePayment/:id',component:HomeComponent}
 ];
@@ -33,7 +37,9 @@ const routes: Routes = [
     AddPaymentComponent,
     NgxNotificationComponent,
     AdjustLengthPipe,
-    ManageComponent
+    PaymentEntityComponent,
+    PaymentModeComponent,
+    PaymentCategoryComponent
   ],
   imports: [
     BrowserModule,

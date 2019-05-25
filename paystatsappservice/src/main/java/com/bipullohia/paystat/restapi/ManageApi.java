@@ -59,18 +59,21 @@ public class ManageApi {
 	@DeleteMapping("/{option}/{id}")
 	public ResponseEntity<Void> deletePayment(@PathVariable("option") String option, @PathVariable("id") int id){
 		
-		boolean result = false;
-		
+		boolean result = false;		
 		switch(option) {
 		case "paymentEntity": 
 			result = paymentEntityService.deletePaymentEntity(id);
+			break;
 			
 		case "paymentCategory":
 			result = paymentCategoryService.deletePaymentCategory(id);
+			break;
 		
 		case "paymentMode":
 			result = paymentModeService.deletePaymentMode(id);
+			break;
 		}	
+		
 		
 		if(result)
 			return new ResponseEntity<>(HttpStatus.OK);

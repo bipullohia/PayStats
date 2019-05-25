@@ -1,0 +1,78 @@
+<div class="container mt-2">
+  <div class="mb-4 mt-4 border-bottom border-dark heading-border clearfix">
+    <h4 class="float-left">Manage Payment Categories </h4>
+    <button (click)="viewAddModal(addCategoryModal)" class="btn btn-outline-info float-right">Add New</button>
+  </div>
+  <div class="mb-4">
+    <ul class="list-group">
+      <li class="list-group-item" *ngFor="let category of paymentCategories; index as i"
+        (mouseover)="cf.hidden=false; ts.hidden=true" (mouseleave)="cf.hidden=true; ts.hidden=false">
+
+        <span class="font-weight-bold mr-2">{{category.categoryName}}</span>
+
+        <div class="float-right row">
+          <span class="text-muted font-weight-lighter mr-3" style="font-size: 12px;" #ts>Edited on
+            {{category.timestamp | date : 'EEE, dd MMM'}}</span>
+          <div hidden="true" #cf>
+
+            <a (click)="viewAddModal(addCategoryModal, category, i)">
+              <img [src]="editLogo" class="ml-3 img-icon-small" data-toggle="tooltip" data-placement="bottom"
+                title="Edit this Payment Category" />
+            </a>
+
+            <a (click)="viewDeleteModal(deleteCategoryModal, category, i)">
+              <img [src]="garbageLogo" class="ml-3 mr-3 img-icon-small" data-toggle="tooltip" data-placement="bottom"
+                title="Delete this Payment Category" />
+            </a>
+
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<ng-template #addCategoryModal>
+  <div>
+    <div class="modal-header">
+      <h4 *ngIf="!isEditing" class="modal-title pull-left">Add New Payment Category</h4>
+      <h4 *ngIf="isEditing" class="modal-title pull-left">Edit Payment Category</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="restoreOriginalValue()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form class="form" #f="ngForm" (ngSubmit)="f.valid && save()">
+        <div class="form-group col-sm-6">
+          <label for="paymentCategoryInput"> Payment Category Name* </label>
+          <input class="form-control" id="paymentCategoryInput" name="paymentCategoryInput" required
+            [(ngModel)]="selectedCategoryName" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="restoreOriginalValue()">Cancel</button>
+          <button type="submit" class="btn btn-danger">Submit</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</ng-template>
+
+<ng-template #deleteCategoryModal>
+  <div>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">Delete Payment Category</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="deleteModalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete Payment Category "{{categorySelected.categoryName}}"? </p>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="deleteModalRef.hide()">Cancel</button>
+      <button class="btn btn-danger" (click)="deletePaymentCategory()">Yes, Delete</button>
+    </div>
+  </div>
+</ng-template>

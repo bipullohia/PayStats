@@ -20,7 +20,7 @@ export class PaymentListComponent implements OnInit {
   garbageLogo: string;
   detailLogo: string;
   gridViewLogo: string;
-listViewLogo: string;
+  listViewLogo: string;
 
   modalRef: BsModalRef;
   detailsModalRef: BsModalRef;
@@ -44,43 +44,43 @@ listViewLogo: string;
     this.isGridView = true;
     this.getAllPayments();
   }
-    
-  changeView(viewType: string){
-    if(viewType=="list"){
+
+  changeView(viewType: string) {
+    if (viewType == "list") {
       this.isGridView = false;
-    }else{
+    } else {
       this.isGridView = true;
     }
   }
 
-    //this.isEditing = false;
+  //this.isEditing = false;
 
-    // this.activatedRoute.params.subscribe(
-    //   (params) => {
-    //     let category = params['category'];
-    //     if (category) {
-    //       console.log("Category Tasks available");
-    //       this.paymentService.searchTasks("taskCategory", category).subscribe(
-    //         (data) => {
-    //           this.tasks = data;
-    //           //console.log(this.tasks + "activated");
-    //           this.isEditing = true;
-    //         }
-    //       );
-    //     } else {
-    //       console.log("All Tasks");
-    //       this.taskService.getAllTasks().subscribe(
-    //         (data) => {
-    //           this.tasks = data;
-    //           //console.log(this.tasks + "all tasks");
-    //         }
-    //       );
-    //     }
-    //   }
-    // );
-  
+  // this.activatedRoute.params.subscribe(
+  //   (params) => {
+  //     let category = params['category'];
+  //     if (category) {
+  //       console.log("Category Tasks available");
+  //       this.paymentService.searchTasks("taskCategory", category).subscribe(
+  //         (data) => {
+  //           this.tasks = data;
+  //           //console.log(this.tasks + "activated");
+  //           this.isEditing = true;
+  //         }
+  //       );
+  //     } else {
+  //       console.log("All Tasks");
+  //       this.taskService.getAllTasks().subscribe(
+  //         (data) => {
+  //           this.tasks = data;
+  //           //console.log(this.tasks + "all tasks");
+  //         }
+  //       );
+  //     }
+  //   }
+  // );
 
-  getAllPayments(){
+
+  getAllPayments() {
     this.paymentService.getAllPayments().subscribe(
       (data) => {
         this.payments = data;
@@ -88,29 +88,29 @@ listViewLogo: string;
     );
   }
 
-  deleteModal(template: TemplateRef<any>, payment: Payment, index:number) {
+  deleteModal(template: TemplateRef<any>, payment: Payment, index: number) {
     this.modalRef = this.modalService.show(template);
     this.paymentSelected = payment;
     this.indexSelected = index;
   }
 
-  viewDetails(template: TemplateRef<any>, payment: Payment, index:number){
+  viewDetails(template: TemplateRef<any>, payment: Payment, index: number) {
     this.detailsModalRef = this.modalService.show(template);
     this.paymentSelected = payment;
     this.indexSelected = index;
   }
 
-  applyFilters(template: TemplateRef<any>){
+  applyFilters(template: TemplateRef<any>) {
     this.filtersModalRef = this.modalService.show(template);
   }
 
-  deletePayment(){
+  deletePayment() {
     this.paymentService.deletePaymentById(this.paymentSelected.payid).subscribe(
       (resp) => {
-        if(resp.ok){
+        if (resp.ok) {
           this.payments.splice(this.indexSelected, 1);
           this.ngxNotificationService.sendMessage('Payment Record successfully deleted!', 'success', 'bottom-right');
-        }else{
+        } else {
           this.ngxNotificationService.sendMessage('Payment Record deletion failed!', 'danger', 'bottom-right')
         }
       }
