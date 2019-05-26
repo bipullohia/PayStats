@@ -1,19 +1,24 @@
 <div class="container mt-2">
   <div class="mb-4 mt-4 border-bottom border-dark heading-border  clearfix">
-    <h4 class="float-left">All Payments </h4>
+    <h4 class="float-left">View Payments </h4>
     <div class="float-right mb-2">
-      <button class="btn btn-outline-info mr-3" (click)="applyFilters(filtersModal)">Apply Filters</button>
+      <button class="btn btn-outline-info mr-3" (click)="viewApplyFiltersModal(filtersModal)">Apply Filters</button>
       <div class="btn-group" dropdown>
         <button id="button-basic" dropdownToggle type="button" class="btn btn-outline-info dropdown-toggle"
           aria-controls="dropdown-basic">
           Sort By: {{sortingApplied}}<span class="caret"></span>
         </button>
         <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
-          <li role="menuitem"><a (click)="sortArray('mostRecentPaymentFirst')" class="dropdown-item">Most Recent Payment First</a></li>
-          <li role="menuitem"><a (click)="sortArray('oldestPaymentFirst')" class="dropdown-item">Oldest Payment First</a></li>
-          <li role="menuitem"><a (click)="sortArray('paymentAmountLowToHigh')" class="dropdown-item">Payment Amount: Low to High</a></li>
-          <li role="menuitem"><a (click)="sortArray('paymentAmountHighToLow')" class="dropdown-item">Payment Amount: High to Low</a></li>
-          <li role="menuitem"><a (click)="sortArray('recentlyAddedPayment')" class="dropdown-item">Recently Added Payment</a></li>
+          <li role="menuitem"><a (click)="sortArray('mostRecentPaymentFirst')" class="dropdown-item">Most Recent Payment
+              First</a></li>
+          <li role="menuitem"><a (click)="sortArray('oldestPaymentFirst')" class="dropdown-item">Oldest Payment
+              First</a></li>
+          <li role="menuitem"><a (click)="sortArray('paymentAmountLowToHigh')" class="dropdown-item">Payment Amount: Low
+              to High</a></li>
+          <li role="menuitem"><a (click)="sortArray('paymentAmountHighToLow')" class="dropdown-item">Payment Amount:
+              High to Low</a></li>
+          <li role="menuitem"><a (click)="sortArray('recentlyAddedPayment')" class="dropdown-item">Recently Added
+              Payment</a></li>
         </ul>
       </div>
       <img [src]="gridViewLogo" class="img-icon mr-2 ml-3 img-thumbnail" (click)="changeView('grid')"
@@ -177,13 +182,107 @@
     </button>
   </div>
   <div class="modal-body ml-3 mr-3">
-    <p>Oh, Hello there!</p>
+
+    <div *ngIf="filtersApplied.length>0">
+      <h6 class="mb-3">Filter(s) already Applied: </h6>
+      <div class="row ml-5 mr-5">
+        <label class="ml-3" *ngFor="let filter of filtersApplied"><span
+            class="badge badge-pill badge-success text-size-large pb-2">{{filter.filterName}}:
+            {{filter.filterValues.toString()}}
+            <span (click)="removeFilter(filterTypeString, 'applied')" aria-hidden="true">&times;</span>
+          </span></label>
+        <!-- <label *ngIf="!addMoreFilterBoolean" (click)="changeAddFilterBooleanValue()" class="ml-3"><span
+            class="badge badge-pill badge-primary text-size-large pb-2">Add Another Filter
+          </span></label> -->
+      </div>
+    </div>
+
+    <div *ngIf="filtersSelected.length>0">
+      <h6 class="mb-3">New Filters Selected: </h6>
+      <div class="row ml-5 mr-5">
+
+        <label class="ml-3" *ngFor="let filter of filtersSelected"><span
+            class="badge badge-pill badge-warning text-size-large pb-2">{{filter.filterName}}:
+            {{filter.filterValues.toString()}}
+            <span (click)="removeFilter(filterTypeString)" aria-hidden="true">&times;</span>
+          </span></label>
+        <label *ngIf="!addMoreFilterBoolean" (click)="changeAddFilterBooleanValue()" class="ml-3"><span
+            class="badge badge-pill badge-primary text-size-large pb-2">Add Another Filter
+          </span></label>
+      </div>
+    </div>
+    <div *ngIf="filtersSelected.length==0 || addMoreFilterBoolean" class="row justify-content-center mt-4">
+      <div class="form-group ml-3">
+        <label for="filterTypeInput">Select Filter Type: </label>
+        <select class="form-control" id="filterTypeInput" name="filterTypeInput" required
+          [(ngModel)]="filterTypeString">
+          <option value="paymentDate">Payment Date</option>
+          <option value="paymentAmount">Payment Amount</option>
+          <option value="paymentCategory">Payment Category</option>
+          <option value="paymentMode">Payment Mode</option>
+          <option value="paymentEntity">Payment Entity</option>
+        </select>
+      </div>
+
+      <div *ngIf="filterTypeString=='paymentDate'" class="col-xs-12 col-12 col-md-4 form-group">
+        <label>Select Date Range: </label>
+        <input type="text" placeholder="Daterangepicker" class="form-control" bsDaterangepicker>
+      </div>
+
+      <div *ngIf="filterTypeString=='paymentAmount'" class="form-group ml-3">
+        <label for="minAmountInput">Min. Amount</label>
+        <input type="number" class="form-control" id="minAmountInput" name="minAmountInput">
+      </div>
+
+      <div *ngIf="filterTypeString=='paymentAmount'" class="form-group ml-3">
+        <label for="maxAmountInput">Max. Amount</label>
+        <input type="number" class="form-control" id="maxAmountInput" name="maxAmountInput">
+      </div>
+
+      <div *ngIf="filterTypeString=='paymentCategory'" class="ml-5">
+        <label>Select Payment Categories: </label>
+        <div *ngFor="let category of paymentCategories">
+          <div class="form-check">
+            <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" value=""
+                [(ngModel)]="category.selected">{{category.categoryName}}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="filterTypeString=='paymentEntity'" class="ml-5">
+        <label>Select Payment Entities: </label>
+        <div *ngFor="let entity of paymentEntities">
+          <div class="form-check">
+            <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" value=""
+                [(ngModel)]="entity.selected">{{entity.entityName}}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="filterTypeString=='paymentMode'" class="ml-5">
+        <label>Select Payment Modes: </label>
+        <div *ngFor="let mode of paymentModes">
+          <div class="form-check">
+            <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" value="" [(ngModel)]="mode.selected">{{mode.paymodeName}}
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="filterTypeString!=''" class="row justify-content-center mt-3 mb-3">
+      <button (click)="addFilter(filterTypeString)" type="button" class="btn btn-primary ml-3 mr-3">Add Filter</button>
+    </div>
+
   </div>
   <div class="modal-footer">
-    <button class="btn btn-info" routerLink="/editPayment/{{paymentSelected.payid}}"
-      (click)="filtersModalRef.hide()">Reset</button>
-    <button class="btn btn-danger"
-      (click)="deleteModal(modal, paymentSelected, indexSelected); filtersModalRef.hide()">Apply</button>
+    <button class="btn btn-outline-secondary" (click)="closeFilterModal()">Close</button>
+    <button class="btn btn-outline-info" (click)="resetFilters()">Remove All</button>
+    <button class="btn btn-danger" (click)="applyFilters()">Apply</button>
   </div>
 </ng-template>
 

@@ -8,14 +8,15 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './component/home/home.component';
 import { PaymentListComponent } from './component/payment-list/payment-list.component';
 import { AddPaymentComponent } from './component/add-payment/add-payment.component';
+import { PaymentEntityComponent } from './component/manage/payment-entity/payment-entity.component';
+import { PaymentModeComponent } from './component/manage/payment-mode/payment-mode.component';
+import { PaymentCategoryComponent } from './component/manage/payment-category/payment-category.component';
 
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { NgxNotificationComponent } from 'ngx-notification';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { AdjustLengthPipe } from './pipe/adjust-length.pipe';
-import { PaymentEntityComponent } from './component/manage/payment-entity/payment-entity.component';
-import { PaymentModeComponent } from './component/manage/payment-mode/payment-mode.component';
-import { PaymentCategoryComponent } from './component/manage/payment-category/payment-category.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -47,6 +48,7 @@ const routes: Routes = [
     HttpModule,
     RouterModule.forRoot(routes),
     BsDropdownModule.forRoot(),
+    BsDatepickerModule.forRoot(),
     ModalModule.forRoot()
   ],
   providers: [],

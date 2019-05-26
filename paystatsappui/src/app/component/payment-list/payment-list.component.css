@@ -12,3 +12,12 @@
     width: 19px !important;
     height: 19px !important;
 }
+
+.middle-align{
+    vertical-align: middle;
+}
+
+.text-size-large{
+    font-size: 16px;
+    font-weight: normal;
+}

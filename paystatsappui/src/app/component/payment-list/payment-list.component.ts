@@ -4,6 +4,10 @@ import { PaymentService } from 'src/app/service/payment.service';
 import { Payment } from 'src/app/model/payment';
 import { NgxNotificationService } from 'ngx-notification';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { PaymentEntity, PaymentMode, PaymentCategory, Filter } from 'src/app/model/manage';
+import { ManageService } from 'src/app/service/manage.service';
+import { filter } from 'rxjs/operators';
+import { filterQueryId } from '@angular/core/src/view/util';
 
 @Component({
   selector: 'app-payment-list',
@@ -13,6 +17,15 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 export class PaymentListComponent implements OnInit {
 
   payments: Payment[];
+  paymentEntities: PaymentEntity[];
+  paymentCategories: PaymentCategory[];
+  paymentModes: PaymentMode[];
+
+  addMoreFilterBoolean = false;
+
+  isPresent: boolean = true;
+  // filter: Filter;
+
   paymentSelected: Payment;
   indexSelected: number;
 
@@ -22,7 +35,13 @@ export class PaymentListComponent implements OnInit {
   gridViewLogo: string;
   listViewLogo: string;
 
+  filtersSelected: Filter[] = [];
+  filtersApplied: Filter[] = [];
+
   sortingApplied: string;
+  filterTypeString: string;
+  filterNameString: string;
+  dateTypeString: string;
 
   modalRef: BsModalRef;
   detailsModalRef: BsModalRef;
@@ -30,7 +49,7 @@ export class PaymentListComponent implements OnInit {
 
   isGridView: boolean;
   constructor(private paymentService: PaymentService,
-    private activatedRoute: ActivatedRoute,
+    private manageService: ManageService,
     private modalService: BsModalService,
     private ngxNotificationService: NgxNotificationService
   ) {
@@ -45,8 +64,9 @@ export class PaymentListComponent implements OnInit {
   ngOnInit() {
     this.isGridView = false;
     this.getAllPayments();
-    this.sortArray("mostRecentPaymentFirst");
-    //this.payments.
+    this.getAllPaymentCategory();
+    this.getAllPaymentEntity();
+    this.getAllPaymentModes();
   }
 
   changeView(viewType: string) {
@@ -55,6 +75,33 @@ export class PaymentListComponent implements OnInit {
     } else {
       this.isGridView = true;
     }
+  }
+
+  getAllPaymentEntity() {
+    this.paymentEntities = [];
+    this.manageService.getAllPaymentEntity().subscribe(
+      (data) => {
+        this.paymentEntities = data;
+      }
+    );
+  }
+
+  getAllPaymentCategory() {
+    this.paymentCategories = [];
+    this.manageService.getAllPaymentCategory().subscribe(
+      (data) => {
+        this.paymentCategories = data;
+      }
+    );
+  }
+
+  getAllPaymentModes() {
+    this.paymentModes = [];
+    this.manageService.getAllPaymentMode().subscribe(
+      (data) => {
+        this.paymentModes = data;
+      }
+    );
   }
 
   //this.isEditing = false;
@@ -88,9 +135,12 @@ export class PaymentListComponent implements OnInit {
     this.paymentService.getAllPayments().subscribe(
       (data) => {
         this.payments = data;
+        this.sortArray("mostRecentPaymentFirst");
+        console.log(this.payments.length + "--");
       }
     );
   }
+
 
   sortArray(sortType: string) {
 
@@ -137,8 +187,108 @@ export class PaymentListComponent implements OnInit {
     this.indexSelected = index;
   }
 
-  applyFilters(template: TemplateRef<any>) {
-    this.filtersModalRef = this.modalService.show(template);
+  viewApplyFiltersModal(template: TemplateRef<any>) {
+    this.filterTypeString = "";
+    this.dateTypeString = "";
+    this.filtersModalRef = this.modalService.show(template, { class: 'modal-lg' });
+  }
+
+  removeFilter(filterType: string, filterStatus: string) {
+    //to be applied when filter is removed
+  }
+
+
+  changeAddFilterBooleanValue() {
+    this.addMoreFilterBoolean = true;
+  }
+
+  addFilter(filterType: string, filterValue: string[]) {
+    let filter = new Filter();
+    let filterValueArray: string[] = [];
+
+    switch (filterType) {
+      case "paymentDate":
+        filterValueArray.push("25/01/2019");
+        filterValueArray.push("31/03/2019");
+        break;
+      case "paymentAmount":
+        filterValueArray.push("10");
+        filterValueArray.push("500");
+        break;
+      case "paymentCategory":
+        for(let category of this.paymentCategories){
+          if(category.selected)
+            filterValueArray.push(category.categoryName);
+        }
+        break;
+      case "paymentMode":
+          for(let mode of this.paymentModes){
+            if(mode.selected)
+              filterValueArray.push(mode.paymodeName);
+          }
+        break;
+      case "paymentEntity":
+          for(let entity of this.paymentEntities){
+            if(entity.selected)
+              filterValueArray.push(entity.entityName);
+          }
+        break;
+    }
+
+    filter.filterType = filterType;
+    filter.filterName = this.convertTypeToName(filterType);
+    filter.filterValues = filterValueArray;
+    this.filtersSelected.push(filter);
+
+    this.addMoreFilterBoolean = false;
+    this.filterTypeString = "";
+    this.filterNameString = "";
+    this.dateTypeString = "";
+  }
+
+  convertTypeToName(filterType: string): string {
+    let filterName = filterType.replace(/([A-Z])/g, ' $1').trim();
+    filterName = filterName[0].toUpperCase() + filterName.substring(1);
+    return filterName;
+  }
+
+  resetFilters() {
+    this.filtersSelected = [];
+    this.unselectAllItemsInTheArray(this.paymentEntities);
+    this.unselectAllItemsInTheArray(this.paymentCategories);
+    this.unselectAllItemsInTheArray(this.paymentModes);
+    this.filterTypeString = "";
+    this.filterNameString = "";
+    this.dateTypeString = "";
+    this.addMoreFilterBoolean = false;
+  }
+
+  closeFilterModal(){
+    this.filtersSelected = [];
+    this.unselectAllItemsInTheArray(this.paymentEntities);
+    this.unselectAllItemsInTheArray(this.paymentCategories);
+    this.unselectAllItemsInTheArray(this.paymentModes);
+    this.filterTypeString = "";
+    this.filterNameString = "";
+    this.dateTypeString = "";
+    this.filtersModalRef.hide();
+  }
+
+  applyFilters(){
+    if(this.filtersApplied.length==0){
+      this.filtersApplied = this.filtersSelected;
+    }else{
+      for(let filter of this.filtersSelected){
+        this.filtersApplied.push(filter);
+      }
+    }
+    this.closeFilterModal();
+  }
+
+  unselectAllItemsInTheArray(array: any[]){
+    for(let item of array){
+      item.selected = false;
+    }
   }
 
   deletePayment() {
