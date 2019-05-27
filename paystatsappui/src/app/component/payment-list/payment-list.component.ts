@@ -1,13 +1,10 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { PaymentService } from 'src/app/service/payment.service';
 import { Payment } from 'src/app/model/payment';
 import { NgxNotificationService } from 'ngx-notification';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { PaymentEntity, PaymentMode, PaymentCategory, Filter } from 'src/app/model/manage';
 import { ManageService } from 'src/app/service/manage.service';
-import { filter } from 'rxjs/operators';
-import { filterQueryId } from '@angular/core/src/view/util';
 
 @Component({
   selector: 'app-payment-list',
@@ -20,8 +17,6 @@ export class PaymentListComponent implements OnInit {
   paymentEntities: PaymentEntity[];
   paymentCategories: PaymentCategory[];
   paymentModes: PaymentMode[];
-
-  addMoreFilterBoolean = false;
 
   isPresent: boolean = true;
   // filter: Filter;
@@ -41,11 +36,11 @@ export class PaymentListComponent implements OnInit {
   sortingApplied: string;
   filterTypeString: string;
   filterNameString: string;
-  dateTypeString: string;
 
   modalRef: BsModalRef;
   detailsModalRef: BsModalRef;
   filtersModalRef: BsModalRef;
+  addEditFilterModalRef: BsModalRef;
 
   isGridView: boolean;
   constructor(private paymentService: PaymentService,
@@ -187,19 +182,30 @@ export class PaymentListComponent implements OnInit {
     this.indexSelected = index;
   }
 
-  viewApplyFiltersModal(template: TemplateRef<any>) {
+  viewManageFiltersModal(template: TemplateRef<any>) {
     this.filterTypeString = "";
-    this.dateTypeString = "";
+    //this.filtersSelected = this.filtersApplied;
+    for(let filter of this.filtersApplied){
+      this.filtersSelected.push(filter);
+    }
+
     this.filtersModalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
 
-  removeFilter(filterType: string, filterStatus: string) {
-    //to be applied when filter is removed
+  viewAddEditFilter(template: TemplateRef<any>){
+    this.addEditFilterModalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
 
-
-  changeAddFilterBooleanValue() {
-    this.addMoreFilterBoolean = true;
+  removeFilter(filter: Filter) {
+    console.log(filter + "(((");
+    let i=0;
+    for(let filter of this.filtersSelected){
+      if(filter == filter){
+        console.log("**" + filter.filterType);
+        this.filtersSelected.splice(i,1);
+      }
+      i++;
+    }
   }
 
   addFilter(filterType: string, filterValue: string[]) {
@@ -240,10 +246,10 @@ export class PaymentListComponent implements OnInit {
     filter.filterValues = filterValueArray;
     this.filtersSelected.push(filter);
 
-    this.addMoreFilterBoolean = false;
     this.filterTypeString = "";
     this.filterNameString = "";
-    this.dateTypeString = "";
+
+    this.addEditFilterModalRef.hide();
   }
 
   convertTypeToName(filterType: string): string {
@@ -259,8 +265,6 @@ export class PaymentListComponent implements OnInit {
     this.unselectAllItemsInTheArray(this.paymentModes);
     this.filterTypeString = "";
     this.filterNameString = "";
-    this.dateTypeString = "";
-    this.addMoreFilterBoolean = false;
   }
 
   closeFilterModal(){
@@ -270,7 +274,6 @@ export class PaymentListComponent implements OnInit {
     this.unselectAllItemsInTheArray(this.paymentModes);
     this.filterTypeString = "";
     this.filterNameString = "";
-    this.dateTypeString = "";
     this.filtersModalRef.hide();
   }
 

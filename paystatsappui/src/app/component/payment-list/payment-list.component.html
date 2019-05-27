@@ -2,7 +2,7 @@
   <div class="mb-4 mt-4 border-bottom border-dark heading-border  clearfix">
     <h4 class="float-left">View Payments </h4>
     <div class="float-right mb-2">
-      <button class="btn btn-outline-info mr-3" (click)="viewApplyFiltersModal(filtersModal)">Apply Filters</button>
+      <button class="btn btn-info mr-3" (click)="viewManageFiltersModal(filtersModal)">Manage Filters</button>
       <div class="btn-group" dropdown>
         <button id="button-basic" dropdownToggle type="button" class="btn btn-outline-info dropdown-toggle"
           aria-controls="dropdown-basic">
@@ -28,7 +28,13 @@
     </div>
   </div>
 
-
+  <div *ngIf="filtersApplied.length>0" class="row mb-3 ml-3 mr-3">
+    <label>Filters Applied: </label>
+    <label class="ml-3" *ngFor="let filter of filtersApplied"><span
+        class="badge badge-pill badge-success text-size-large pb-2">{{filter.filterName}}:
+        {{filter.filterValues.toString()}}
+      </span></label>
+  </div>
   <div class="card-columns mb-4" *ngIf="isGridView">
     <div class="card p-3" *ngFor="let p of payments; index as i"
       (mouseover)="cf.hidden=false; nomouse.hidden=true; mouse.hidden=false"
@@ -93,8 +99,6 @@
         <!-- <span class="mr-2 ml-2">|</span>
         <span class="mr-2 ml-2">Paid on: {{p.dateOfTransaction | date}}</span> -->
 
-
-
         <div class="float-right row">
           <span class="text-muted font-weight-lighter mr-3" style="font-size: 12px;" #ts>Edited on
             {{p.timestamp | date : 'EEE, dd MMM'}}</span>
@@ -120,10 +124,7 @@
       </li>
     </ul>
   </div>
-
-
 </div>
-
 
 
 <ng-template #modal>
@@ -174,44 +175,16 @@
   </div>
 </ng-template>
 
-<ng-template #filtersModal>
+<ng-template #addEditFilter>
   <div class="modal-header">
-    <h4 class="modal-title pull-left ml-3">Apply Filters</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="filtersModalRef.hide()">
+    <h4 class="modal-title pull-left ml-3">Add/Edit Filter</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="addEditFilterModalRef.hide()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body ml-3 mr-3">
 
-    <div *ngIf="filtersApplied.length>0">
-      <h6 class="mb-3">Filter(s) already Applied: </h6>
-      <div class="row ml-5 mr-5">
-        <label class="ml-3" *ngFor="let filter of filtersApplied"><span
-            class="badge badge-pill badge-success text-size-large pb-2">{{filter.filterName}}:
-            {{filter.filterValues.toString()}}
-            <span (click)="removeFilter(filterTypeString, 'applied')" aria-hidden="true">&times;</span>
-          </span></label>
-        <!-- <label *ngIf="!addMoreFilterBoolean" (click)="changeAddFilterBooleanValue()" class="ml-3"><span
-            class="badge badge-pill badge-primary text-size-large pb-2">Add Another Filter
-          </span></label> -->
-      </div>
-    </div>
-
-    <div *ngIf="filtersSelected.length>0">
-      <h6 class="mb-3">New Filters Selected: </h6>
-      <div class="row ml-5 mr-5">
-
-        <label class="ml-3" *ngFor="let filter of filtersSelected"><span
-            class="badge badge-pill badge-warning text-size-large pb-2">{{filter.filterName}}:
-            {{filter.filterValues.toString()}}
-            <span (click)="removeFilter(filterTypeString)" aria-hidden="true">&times;</span>
-          </span></label>
-        <label *ngIf="!addMoreFilterBoolean" (click)="changeAddFilterBooleanValue()" class="ml-3"><span
-            class="badge badge-pill badge-primary text-size-large pb-2">Add Another Filter
-          </span></label>
-      </div>
-    </div>
-    <div *ngIf="filtersSelected.length==0 || addMoreFilterBoolean" class="row justify-content-center mt-4">
+  <div class="modal-body">
+    <div class="row justify-content-center mt-4">
       <div class="form-group ml-3">
         <label for="filterTypeInput">Select Filter Type: </label>
         <select class="form-control" id="filterTypeInput" name="filterTypeInput" required
@@ -274,15 +247,54 @@
         </div>
       </div>
     </div>
-    <div *ngIf="filterTypeString!=''" class="row justify-content-center mt-3 mb-3">
-      <button (click)="addFilter(filterTypeString)" type="button" class="btn btn-primary ml-3 mr-3">Add Filter</button>
-    </div>
+  </div>
 
+  <div class="modal-footer">
+    <button class="btn btn-outline-secondary" (click)="addEditFilterModalRef.hide()">Close</button>
+    <button *ngIf="filterTypeString!=''" (click)="addFilter(filterTypeString)"
+      class="btn btn-primary ml-3">Submit</button>
+  </div>
+</ng-template>
+
+<ng-template #filtersModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left ml-3">Manage Filters</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="filtersModalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body ml-3 mr-3">
+
+    <div class="mb-4" *ngIf="filtersApplied.length>0">
+      <h6 class="mb-3">Filter(s) Applied: </h6>
+      <div class="row ml-5 mr-5">
+        <label class="ml-3" *ngFor="let filter of filtersApplied"><span
+            class="badge badge-pill badge-success text-size-large pb-2">{{filter.filterName}}:
+            {{filter.filterValues.toString()}}
+          </span></label>
+      </div>
+    </div>
+    <div>
+      <h6 class="mb-3">Add/Remove Filters: </h6>
+      <div class="row ml-5 mr-5">
+        <div *ngIf="filtersSelected.length>0">
+          <label class="ml-3" *ngFor="let filter of filtersSelected"><span
+              class="badge badge-pill badge-warning text-size-large pb-2">{{filter.filterName}}:
+              {{filter.filterValues.toString()}}
+              <span (click)="removeFilter(filter)" aria-hidden="true">&times;</span>
+            </span></label>
+        </div>
+        <label (click)="viewAddEditFilter(addEditFilter)" class="ml-3"><span
+            class="badge badge-pill badge-primary text-size-large pb-2">Add Another Filter
+          </span></label>
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-outline-secondary" (click)="closeFilterModal()">Close</button>
-    <button class="btn btn-outline-info" (click)="resetFilters()">Remove All</button>
-    <button class="btn btn-danger" (click)="applyFilters()">Apply</button>
+    <button class="btn btn-outline-info" (click)="resetFilters()">Reset</button>
+    <button class="btn btn-danger" (click)="removeAllFilters()">Remove All</button>
+    <button class="btn btn-primary" (click)="applyFilters()">Apply</button>
   </div>
 </ng-template>
 
