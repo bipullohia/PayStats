@@ -178,7 +178,7 @@
 <ng-template #addEditFilter>
   <div class="modal-header">
     <h4 class="modal-title pull-left ml-3">Add/Edit Filter</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="addEditFilterModalRef.hide()">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeAddEditFilterModal()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -189,11 +189,13 @@
         <label for="filterTypeInput">Select Filter Type: </label>
         <select class="form-control" id="filterTypeInput" name="filterTypeInput" required
           [(ngModel)]="filterTypeString">
-          <option value="paymentDate">Payment Date</option>
+          <!-- <option value="paymentDate">Payment Date</option>
           <option value="paymentAmount">Payment Amount</option>
           <option value="paymentCategory">Payment Category</option>
           <option value="paymentMode">Payment Mode</option>
-          <option value="paymentEntity">Payment Entity</option>
+          <option value="paymentEntity">Payment Entity</option> -->
+          <option *ngFor="let option of filterTypeOptions; let i = index" 
+            value="{{option}}">{{convertTypeToName(option)}}</option>
         </select>
       </div>
 
@@ -250,7 +252,10 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-outline-secondary" (click)="addEditFilterModalRef.hide()">Close</button>
+    <div *ngIf="nullValueErrorBoolean" class="mr-3 text-danger">
+      <h6>{{errorMsg}}</h6>
+    </div>
+    <button class="btn btn-outline-secondary" (click)="closeAddEditFilterModal()">Close</button>
     <button *ngIf="filterTypeString!=''" (click)="addFilter(filterTypeString)"
       class="btn btn-primary ml-3">Submit</button>
   </div>
@@ -259,12 +264,12 @@
 <ng-template #filtersModal>
   <div class="modal-header">
     <h4 class="modal-title pull-left ml-3">Manage Filters</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="filtersModalRef.hide()">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeFilterModal()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class="modal-body ml-3 mr-3">
 
+  <div class="modal-body ml-3 mr-3">
     <div class="mb-4" *ngIf="filtersApplied.length>0">
       <h6 class="mb-3">Filter(s) Applied: </h6>
       <div class="row ml-5 mr-5">
@@ -274,27 +279,36 @@
           </span></label>
       </div>
     </div>
+    <div class="mb-4 mt-2" *ngIf="filtersApplied.length==0">
+      <h5 class="text-danger">No Filter Applied Yet!</h5>
+    </div>
     <div>
       <h6 class="mb-3">Add/Remove Filters: </h6>
       <div class="row ml-5 mr-5">
         <div *ngIf="filtersSelected.length>0">
-          <label class="ml-3" *ngFor="let filter of filtersSelected"><span
+          <label class="ml-3" *ngFor="let filter of filtersSelected; let i=index"><span
+              (click)="viewAddEditFilter(addEditFilter, i)"
               class="badge badge-pill badge-warning text-size-large pb-2">{{filter.filterName}}:
               {{filter.filterValues.toString()}}
-              <span (click)="removeFilter(filter)" aria-hidden="true">&times;</span>
+              <span (click)="removeFilter(i)" aria-hidden="true">&times;</span>
             </span></label>
         </div>
         <label (click)="viewAddEditFilter(addEditFilter)" class="ml-3"><span
-            class="badge badge-pill badge-primary text-size-large pb-2">Add Another Filter
+            class="badge badge-pill badge-primary text-size-large pb-2">Add New Filter
           </span></label>
       </div>
     </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-outline-secondary" (click)="closeFilterModal()">Close</button>
-    <button class="btn btn-outline-info" (click)="resetFilters()">Reset</button>
-    <button class="btn btn-danger" (click)="removeAllFilters()">Remove All</button>
-    <button class="btn btn-primary" (click)="applyFilters()">Apply</button>
+    <button *ngIf="filtersApplied.length>0" class="btn btn-outline-info" data-toggle="tooltip" data-placement="bottom"
+      title="Sets the originally applied Filter(s)" (click)="resetFilters()">Reset</button>
+    <button *ngIf="filtersSelected.length==0 && filtersApplied.length==0" class="btn btn-primary" disabled
+      data-toggle="tooltip" data-placement="bottom" title="Add atleast one Filter to enable this button"
+      (click)="applyFilters()">Apply</button>
+    <button *ngIf="filtersSelected.length>0 || filtersApplied.length>0 " class="btn btn-primary" data-toggle="tooltip"
+      data-placement="bottom" title="Applies the Filter(s) selected above to Payments"
+      (click)="applyFilters()">Apply</button>
   </div>
 </ng-template>
 

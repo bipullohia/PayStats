@@ -21,6 +21,11 @@ export class PaymentListComponent implements OnInit {
   isPresent: boolean = true;
   // filter: Filter;
 
+  nullValueErrorBoolean: boolean = false;
+  errorMsg: string;
+
+  filterTypeOptions: string[];
+
   paymentSelected: Payment;
   indexSelected: number;
 
@@ -57,6 +62,12 @@ export class PaymentListComponent implements OnInit {
 
 
   ngOnInit() {
+    this.filterTypeOptions = ["paymentDate", "paymentAmount", 
+      "paymentCategory", "paymentMode", "paymentEntity"];
+
+      for(let option of this.filterTypeOptions){
+        console.log(option);
+      }
     this.isGridView = false;
     this.getAllPayments();
     this.getAllPaymentCategory();
@@ -184,6 +195,7 @@ export class PaymentListComponent implements OnInit {
 
   viewManageFiltersModal(template: TemplateRef<any>) {
     this.filterTypeString = "";
+    this.filtersSelected = [];
     //this.filtersSelected = this.filtersApplied;
     for(let filter of this.filtersApplied){
       this.filtersSelected.push(filter);
@@ -192,20 +204,57 @@ export class PaymentListComponent implements OnInit {
     this.filtersModalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
 
-  viewAddEditFilter(template: TemplateRef<any>){
+  viewAddEditFilter(template: TemplateRef<any>, index: number){
+
+    if(index != null){
+      this.filterTypeString = this.filtersSelected[index].filterType;
+      
+      if(this.filterTypeString=="paymentCategory"){
+        for(let value of this.filtersSelected[index].filterValues){
+          for(let category of this.paymentCategories){
+            if(value == category.categoryName)
+            category.selected = true;
+          }
+        }
+      }
+
+      if(this.filterTypeString=="paymentEntity"){
+        for(let value of this.filtersSelected[index].filterValues){
+          for(let entity of this.paymentEntities){
+            if(value == entity.entityName)
+            entity.selected = true;
+          }
+        }
+      }
+
+      if(this.filterTypeString=="paymentMode"){
+        for(let value of this.filtersSelected[index].filterValues){
+          for(let mode of this.paymentModes){
+            if(value == mode.paymodeName)
+            mode.selected = true;
+          }
+        }
+      }
+     
+    }
+    
     this.addEditFilterModalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
 
-  removeFilter(filter: Filter) {
-    console.log(filter + "(((");
-    let i=0;
-    for(let filter of this.filtersSelected){
-      if(filter == filter){
-        console.log("**" + filter.filterType);
-        this.filtersSelected.splice(i,1);
-      }
-      i++;
-    }
+  
+
+  removeFilter(index: number) {
+    this.filterTypeOptions.push(this.filtersSelected[index].filterType);
+    this.filtersSelected.splice(index,1);
+    // console.log(filter + "(((");
+    // let i=0;
+    // for(let filter of this.filtersSelected){
+    //   if(filter == filter){
+    //     console.log("**" + filter.filterType);
+    //     this.filtersSelected.splice(i,1);
+    //   }
+    //   i++;
+    // }
   }
 
   addFilter(filterType: string, filterValue: string[]) {
@@ -241,15 +290,37 @@ export class PaymentListComponent implements OnInit {
         break;
     }
 
-    filter.filterType = filterType;
-    filter.filterName = this.convertTypeToName(filterType);
-    filter.filterValues = filterValueArray;
-    this.filtersSelected.push(filter);
+    if(filterValueArray.length==0){
+      this.nullValueErrorBoolean = true;
+      this.errorMsg = "Error! Select atleast one " + this.convertTypeToName(this.filterTypeString);
+    }else{
+      filter.filterType = filterType;
+      filter.filterName = this.convertTypeToName(filterType);
+      filter.filterValues = filterValueArray;
 
-    this.filterTypeString = "";
-    this.filterNameString = "";
+      // to not have filters of the same type added again
+      for(let i = 0; i<this.filtersSelected.length; i++){
+        if(this.filtersSelected[i].filterType == filterType){
+          this.filtersSelected.splice(i, 1);
+          break;
+        }
+      }
 
-    this.addEditFilterModalRef.hide();
+      this.filtersSelected.push(filter);
+  
+      this.checkFilterTypeRepetition(filterType);
+
+      this.filterTypeString = "";
+      this.filterNameString = "";
+      this.unselectAllItemsInTheArray(this.paymentEntities);
+      this.unselectAllItemsInTheArray(this.paymentCategories);
+      this.unselectAllItemsInTheArray(this.paymentModes);
+      this.nullValueErrorBoolean = false;
+      this.errorMsg = "";
+      this.addEditFilterModalRef.hide();
+    }
+
+    
   }
 
   convertTypeToName(filterType: string): string {
@@ -258,29 +329,39 @@ export class PaymentListComponent implements OnInit {
     return filterName;
   }
 
+  checkFilterTypeRepetition(filterType: string){
+    for(let filter of this.filtersSelected){
+      if(filter.filterType == filterType){
+        this.removeFilterTypeOptionsValue(filterType);
+      }
+    }    
+  }
+
+  removeFilterTypeOptionsValue(value: string){
+    for(let i = 0; i< this.filterTypeOptions.length; i++){
+      if(this.filterTypeOptions[i] == value){
+        this.filterTypeOptions.splice(i, 1);
+      }
+    }
+  }
+
   resetFilters() {
     this.filtersSelected = [];
-    this.unselectAllItemsInTheArray(this.paymentEntities);
-    this.unselectAllItemsInTheArray(this.paymentCategories);
-    this.unselectAllItemsInTheArray(this.paymentModes);
-    this.filterTypeString = "";
-    this.filterNameString = "";
+    for(let filter of this.filtersApplied){
+      this.filtersSelected.push(filter);
+    }
   }
 
   closeFilterModal(){
-    this.filtersSelected = [];
-    this.unselectAllItemsInTheArray(this.paymentEntities);
-    this.unselectAllItemsInTheArray(this.paymentCategories);
-    this.unselectAllItemsInTheArray(this.paymentModes);
-    this.filterTypeString = "";
-    this.filterNameString = "";
     this.filtersModalRef.hide();
+    this.filtersSelected = [];
   }
 
   applyFilters(){
     if(this.filtersApplied.length==0){
       this.filtersApplied = this.filtersSelected;
     }else{
+      this.filtersApplied = [];
       for(let filter of this.filtersSelected){
         this.filtersApplied.push(filter);
       }
@@ -292,6 +373,15 @@ export class PaymentListComponent implements OnInit {
     for(let item of array){
       item.selected = false;
     }
+  }
+
+  closeAddEditFilterModal(){
+    this.addEditFilterModalRef.hide();
+    this.unselectAllItemsInTheArray(this.paymentEntities);
+    this.unselectAllItemsInTheArray(this.paymentCategories);
+    this.unselectAllItemsInTheArray(this.paymentModes);
+    this.filterTypeString = "";
+    this.filterNameString = "";
   }
 
   deletePayment() {
