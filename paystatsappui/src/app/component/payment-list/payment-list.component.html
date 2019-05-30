@@ -201,17 +201,18 @@
 
       <div *ngIf="filterTypeString=='paymentDate'" class="col-xs-12 col-12 col-md-4 form-group">
         <label>Select Date Range: </label>
-        <input type="text" placeholder="Daterangepicker" class="form-control" bsDaterangepicker>
+        <input type="text" placeholder="Daterangepicker" [(ngModel)]="bsDateRangeValue" 
+        [bsConfig]="{ dateInputFormat: 'DD-MM-YYYY' }" class="form-control" bsDaterangepicker>
       </div>
 
       <div *ngIf="filterTypeString=='paymentAmount'" class="form-group ml-3">
         <label for="minAmountInput">Min. Amount</label>
-        <input type="number" class="form-control" id="minAmountInput" name="minAmountInput">
+        <input type="number" class="form-control" id="minAmountInput" [(ngModel)]="minAmountFilter" name="minAmountInput">
       </div>
 
       <div *ngIf="filterTypeString=='paymentAmount'" class="form-group ml-3">
         <label for="maxAmountInput">Max. Amount</label>
-        <input type="number" class="form-control" id="maxAmountInput" name="maxAmountInput">
+        <input type="number" class="form-control" id="maxAmountInput" [(ngModel)]="maxAmountFilter" name="maxAmountInput">
       </div>
 
       <div *ngIf="filterTypeString=='paymentCategory'" class="ml-5">
@@ -293,7 +294,7 @@
               <span (click)="removeFilter(i)" aria-hidden="true">&times;</span>
             </span></label>
         </div>
-        <label (click)="viewAddEditFilter(addEditFilter)" class="ml-3"><span
+        <label (click)="viewAddEditFilter(addEditFilter)" *ngIf="!allFiltersSelectedBoolean" class="ml-3"><span
             class="badge badge-pill badge-primary text-size-large pb-2">Add New Filter
           </span></label>
       </div>

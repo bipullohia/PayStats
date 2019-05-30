@@ -29,6 +29,8 @@ export class PaymentListComponent implements OnInit {
   paymentSelected: Payment;
   indexSelected: number;
 
+  isEditingFilter: boolean = false;
+
   editLogo: string;
   garbageLogo: string;
   detailLogo: string;
@@ -47,6 +49,15 @@ export class PaymentListComponent implements OnInit {
   filtersModalRef: BsModalRef;
   addEditFilterModalRef: BsModalRef;
 
+  bsDateValue = new Date();
+  bsDateRangeValue: Date[];
+  maxDate = new Date();
+
+allFiltersSelectedBoolean: boolean = false;
+
+  minAmountFilter: number;
+  maxAmountFilter: number;
+
   isGridView: boolean;
   constructor(private paymentService: PaymentService,
     private manageService: ManageService,
@@ -62,17 +73,41 @@ export class PaymentListComponent implements OnInit {
 
 
   ngOnInit() {
-    this.filterTypeOptions = ["paymentDate", "paymentAmount", 
-      "paymentCategory", "paymentMode", "paymentEntity"];
 
-      for(let option of this.filterTypeOptions){
-        console.log(option);
-      }
+    this.setAllValuesOfFilterType();
+
+    for (let option of this.filterTypeOptions) {
+      console.log(option);
+    }
     this.isGridView = false;
     this.getAllPayments();
     this.getAllPaymentCategory();
     this.getAllPaymentEntity();
     this.getAllPaymentModes();
+
+    
+    this.setDefaultValuesForFilter();
+  }
+
+  setAllValuesOfFilterType() {
+    this.filterTypeOptions = ["paymentDate", "paymentAmount",
+      "paymentCategory", "paymentMode", "paymentEntity"];
+  }
+
+  setDefaultValuesForFilter() {
+    this.bsDateValue.setDate(this.maxDate.getDate() - 7);
+    //here maxDate is the current Date by default
+    this.bsDateRangeValue = [this.bsDateValue, this.maxDate];
+    this.minAmountFilter = 0;
+    this.maxAmountFilter = 500;
+    this.checkIfAllFiltersSelected();
+    this.filterTypeString = "";
+    this.filterNameString = "";
+    this.unselectAllItemsInTheArray(this.paymentEntities);
+    this.unselectAllItemsInTheArray(this.paymentCategories);
+    this.unselectAllItemsInTheArray(this.paymentModes);
+    this.nullValueErrorBoolean = false;
+    this.errorMsg = "";
   }
 
   changeView(viewType: string) {
@@ -194,58 +229,65 @@ export class PaymentListComponent implements OnInit {
   }
 
   viewManageFiltersModal(template: TemplateRef<any>) {
-    this.filterTypeString = "";
+    // this.filterTypeString = "";
     this.filtersSelected = [];
+    this.setAllValuesOfFilterType();
+    this.checkIfAllFiltersSelected();
     //this.filtersSelected = this.filtersApplied;
-    for(let filter of this.filtersApplied){
+    this.setDefaultValuesForFilter();
+    for (let filter of this.filtersApplied) {
       this.filtersSelected.push(filter);
     }
+    // this.checkIfAllFiltersSelected();
 
     this.filtersModalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
 
-  viewAddEditFilter(template: TemplateRef<any>, index: number){
+  viewAddEditFilter(template: TemplateRef<any>, index: number) {
 
-    if(index != null){
+    if (index != null) {
+      this.isEditingFilter = true;
       this.filterTypeString = this.filtersSelected[index].filterType;
-      
-      if(this.filterTypeString=="paymentCategory"){
-        for(let value of this.filtersSelected[index].filterValues){
-          for(let category of this.paymentCategories){
-            if(value == category.categoryName)
-            category.selected = true;
+
+      if (this.filterTypeString == "paymentCategory") {
+        for (let value of this.filtersSelected[index].filterValues) {
+          for (let category of this.paymentCategories) {
+            if (value == category.categoryName)
+              category.selected = true;
           }
         }
       }
 
-      if(this.filterTypeString=="paymentEntity"){
-        for(let value of this.filtersSelected[index].filterValues){
-          for(let entity of this.paymentEntities){
-            if(value == entity.entityName)
-            entity.selected = true;
+      if (this.filterTypeString == "paymentEntity") {
+        for (let value of this.filtersSelected[index].filterValues) {
+          for (let entity of this.paymentEntities) {
+            if (value == entity.entityName)
+              entity.selected = true;
           }
         }
       }
 
-      if(this.filterTypeString=="paymentMode"){
-        for(let value of this.filtersSelected[index].filterValues){
-          for(let mode of this.paymentModes){
-            if(value == mode.paymodeName)
-            mode.selected = true;
+      if (this.filterTypeString == "paymentMode") {
+        for (let value of this.filtersSelected[index].filterValues) {
+          for (let mode of this.paymentModes) {
+            if (value == mode.paymodeName)
+              mode.selected = true;
           }
         }
       }
-     
+
     }
     
+    this.checkAllFilterTypeRepetitions();
     this.addEditFilterModalRef = this.modalService.show(template, { class: 'modal-lg' });
   }
 
-  
+
 
   removeFilter(index: number) {
     this.filterTypeOptions.push(this.filtersSelected[index].filterType);
-    this.filtersSelected.splice(index,1);
+    this.filtersSelected.splice(index, 1);
+    this.checkIfAllFiltersSelected();
     // console.log(filter + "(((");
     // let i=0;
     // for(let filter of this.filtersSelected){
@@ -260,67 +302,69 @@ export class PaymentListComponent implements OnInit {
   addFilter(filterType: string, filterValue: string[]) {
     let filter = new Filter();
     let filterValueArray: string[] = [];
+    this.isEditingFilter = false;
 
     switch (filterType) {
       case "paymentDate":
-        filterValueArray.push("25/01/2019");
-        filterValueArray.push("31/03/2019");
+        filterValueArray.push(this.getDateString(this.bsDateRangeValue[0]));
+        filterValueArray.push(this.getDateString(this.bsDateRangeValue[1]));
         break;
       case "paymentAmount":
-        filterValueArray.push("10");
-        filterValueArray.push("500");
+        filterValueArray.push(this.minAmountFilter.toString());
+        filterValueArray.push(this.maxAmountFilter.toString());
         break;
       case "paymentCategory":
-        for(let category of this.paymentCategories){
-          if(category.selected)
+        for (let category of this.paymentCategories) {
+          if (category.selected)
             filterValueArray.push(category.categoryName);
         }
         break;
       case "paymentMode":
-          for(let mode of this.paymentModes){
-            if(mode.selected)
-              filterValueArray.push(mode.paymodeName);
-          }
+        for (let mode of this.paymentModes) {
+          if (mode.selected)
+            filterValueArray.push(mode.paymodeName);
+        }
         break;
       case "paymentEntity":
-          for(let entity of this.paymentEntities){
-            if(entity.selected)
-              filterValueArray.push(entity.entityName);
-          }
+        for (let entity of this.paymentEntities) {
+          if (entity.selected)
+            filterValueArray.push(entity.entityName);
+        }
         break;
     }
 
-    if(filterValueArray.length==0){
+    if (filterValueArray.length == 0) {
       this.nullValueErrorBoolean = true;
       this.errorMsg = "Error! Select atleast one " + this.convertTypeToName(this.filterTypeString);
-    }else{
+    } else {
       filter.filterType = filterType;
       filter.filterName = this.convertTypeToName(filterType);
       filter.filterValues = filterValueArray;
 
       // to not have filters of the same type added again
-      for(let i = 0; i<this.filtersSelected.length; i++){
-        if(this.filtersSelected[i].filterType == filterType){
+      for (let i = 0; i < this.filtersSelected.length; i++) {
+        if (this.filtersSelected[i].filterType == filterType) {
           this.filtersSelected.splice(i, 1);
           break;
         }
       }
 
       this.filtersSelected.push(filter);
-  
+
       this.checkFilterTypeRepetition(filterType);
 
-      this.filterTypeString = "";
-      this.filterNameString = "";
-      this.unselectAllItemsInTheArray(this.paymentEntities);
-      this.unselectAllItemsInTheArray(this.paymentCategories);
-      this.unselectAllItemsInTheArray(this.paymentModes);
-      this.nullValueErrorBoolean = false;
-      this.errorMsg = "";
+      // this.filterTypeString = "";
+      // this.filterNameString = "";
+      // this.unselectAllItemsInTheArray(this.paymentEntities);
+      // this.unselectAllItemsInTheArray(this.paymentCategories);
+      // this.unselectAllItemsInTheArray(this.paymentModes);
+      // this.nullValueErrorBoolean = false;
+      // this.errorMsg = "";
+      this.setDefaultValuesForFilter();
       this.addEditFilterModalRef.hide();
     }
 
-    
+
   }
 
   convertTypeToName(filterType: string): string {
@@ -329,17 +373,32 @@ export class PaymentListComponent implements OnInit {
     return filterName;
   }
 
-  checkFilterTypeRepetition(filterType: string){
-    for(let filter of this.filtersSelected){
-      if(filter.filterType == filterType){
-        this.removeFilterTypeOptionsValue(filterType);
-      }
-    }    
+  checkAllFilterTypeRepetitions(){
+    for(let option of this.filterTypeOptions){
+      this.checkFilterTypeRepetition(option);
+    }
   }
 
-  removeFilterTypeOptionsValue(value: string){
-    for(let i = 0; i< this.filterTypeOptions.length; i++){
-      if(this.filterTypeOptions[i] == value){
+  checkFilterTypeRepetition(filterType: string) {
+    for (let filter of this.filtersSelected) {
+      if (filter.filterType == filterType) {
+        this.removeFilterTypeOptionsValue(filterType);
+      }
+    }
+    
+  }
+
+  checkIfAllFiltersSelected(){
+    if(this.filterTypeOptions.length == 0){
+      this.allFiltersSelectedBoolean = true;
+    }else{
+      this.allFiltersSelectedBoolean = false;
+    }
+  }
+
+  removeFilterTypeOptionsValue(value: string) {
+    for (let i = 0; i < this.filterTypeOptions.length; i++) {
+      if (this.filterTypeOptions[i] == value) {
         this.filterTypeOptions.splice(i, 1);
       }
     }
@@ -347,41 +406,52 @@ export class PaymentListComponent implements OnInit {
 
   resetFilters() {
     this.filtersSelected = [];
-    for(let filter of this.filtersApplied){
+    for (let filter of this.filtersApplied) {
       this.filtersSelected.push(filter);
     }
+    this.checkIfAllFiltersSelected();
   }
 
-  closeFilterModal(){
+  closeFilterModal() {
     this.filtersModalRef.hide();
     this.filtersSelected = [];
+    //this.setDefaultValuesForFilter();
   }
 
-  applyFilters(){
-    if(this.filtersApplied.length==0){
+  getDateString(date: Date): string {
+    //let date = new Date();
+    let day = (date.getDate() < 10 ? "0" + date.getDate() : date.getDate());
+    let month = (date.getMonth() < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1));
+    let dateString = day + "-" + month + "-" + date.getFullYear();
+    return dateString;
+  }
+
+  applyFilters() {
+    if (this.filtersApplied.length == 0) {
       this.filtersApplied = this.filtersSelected;
-    }else{
+    } else {
       this.filtersApplied = [];
-      for(let filter of this.filtersSelected){
+      for (let filter of this.filtersSelected) {
         this.filtersApplied.push(filter);
       }
     }
     this.closeFilterModal();
   }
 
-  unselectAllItemsInTheArray(array: any[]){
-    for(let item of array){
+  unselectAllItemsInTheArray(array: any[]) {
+    for (let item of array) {
       item.selected = false;
     }
   }
 
-  closeAddEditFilterModal(){
+  closeAddEditFilterModal() {
     this.addEditFilterModalRef.hide();
-    this.unselectAllItemsInTheArray(this.paymentEntities);
-    this.unselectAllItemsInTheArray(this.paymentCategories);
-    this.unselectAllItemsInTheArray(this.paymentModes);
-    this.filterTypeString = "";
-    this.filterNameString = "";
+    // this.unselectAllItemsInTheArray(this.paymentEntities);
+    // this.unselectAllItemsInTheArray(this.paymentCategories);
+    // this.unselectAllItemsInTheArray(this.paymentModes);
+    // this.filterTypeString = "";
+    // this.filterNameString = "";
+    this.setDefaultValuesForFilter();
   }
 
   deletePayment() {
