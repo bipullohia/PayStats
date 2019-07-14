@@ -2,7 +2,7 @@
   <div class="mb-4 mt-4 border-bottom border-dark heading-border  clearfix">
     <h4 class="float-left">View Payments </h4>
     <div class="float-right mb-2">
-      <button class="btn btn-info mr-3" (click)="viewManageFiltersModal(filtersModal)">Manage Filters</button>
+      <button class="btn btn-info mr-3" (click)="viewManageFiltersModal(manageFiltersModal)">Manage Filters</button>
       <div class="btn-group" dropdown>
         <button id="button-basic" dropdownToggle type="button" class="btn btn-outline-info dropdown-toggle"
           aria-controls="dropdown-basic">
@@ -96,9 +96,7 @@
         <span class="mr-2 ml-2">Paid <span
             class="font-weight-bold">{{p.amount | currency: 'INR' :'symbol': '1.0-1'}}</span>
           on {{p.dateOfTransaction | date}} by {{p.payType}}</span>
-        <!-- <span class="mr-2 ml-2">|</span>
-        <span class="mr-2 ml-2">Paid on: {{p.dateOfTransaction | date}}</span> -->
-
+        
         <div class="float-right row">
           <span class="text-muted font-weight-lighter mr-3" style="font-size: 12px;" #ts>Edited on
             {{p.timestamp | date : 'EEE, dd MMM'}}</span>
@@ -177,45 +175,47 @@
 
 <ng-template #addEditFilter>
   <div class="modal-header">
-    <h4 class="modal-title pull-left ml-3">Add/Edit Filter</h4>
+    <h4 *ngIf="!isEditingFilter" class="modal-title pull-left ml-3">Add New Filter</h4>
+    <h4 *ngIf="isEditingFilter" class="modal-title pull-left ml-3">Edit Existing Filter</h4>
     <button type="button" class="close pull-right" aria-label="Close" (click)="closeAddEditFilterModal()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-
   <div class="modal-body">
     <div class="row justify-content-center mt-4">
       <div class="form-group ml-3">
         <label for="filterTypeInput">Select Filter Type: </label>
-        <select class="form-control" id="filterTypeInput" name="filterTypeInput" required
-          [(ngModel)]="filterTypeString">
-          <!-- <option value="paymentDate">Payment Date</option>
-          <option value="paymentAmount">Payment Amount</option>
-          <option value="paymentCategory">Payment Category</option>
-          <option value="paymentMode">Payment Mode</option>
-          <option value="paymentEntity">Payment Entity</option> -->
-          <option *ngFor="let option of filterTypeOptions; let i = index" 
-            value="{{option}}">{{convertTypeToName(option)}}</option>
+        <select *ngIf="!isEditingFilter" class="form-control" id="filterTypeInput" name="filterTypeInput" required
+          [(ngModel)]="filterTypeSelected">
+          <option *ngFor="let option of currentFilterTypes; let i = index" value="{{option}}">
+            {{convertTypeToName(option)}}</option>
+        </select>
+
+        <select *ngIf="isEditingFilter" class="form-control" id="filterTypeInput" name="filterTypeInput" required
+          [(ngModel)]="filterTypeSelected">
+          <option selected value="{{filterTypeSelected}}">{{convertTypeToName(filterTypeSelected)}}</option>
         </select>
       </div>
 
-      <div *ngIf="filterTypeString=='paymentDate'" class="col-xs-12 col-12 col-md-4 form-group">
+      <div *ngIf="filterTypeSelected=='paymentDate'" class="col-xs-12 col-12 col-md-4 form-group">
         <label>Select Date Range: </label>
-        <input type="text" placeholder="Daterangepicker" [(ngModel)]="bsDateRangeValue" 
-        [bsConfig]="{ dateInputFormat: 'DD-MM-YYYY' }" class="form-control" bsDaterangepicker>
+        <input type="text" placeholder="Daterangepicker" [(ngModel)]="bsDateRangeValue"
+          [bsConfig]="{ dateInputFormat: 'DD-MM-YYYY' }" class="form-control" bsDaterangepicker>
       </div>
 
-      <div *ngIf="filterTypeString=='paymentAmount'" class="form-group ml-3">
+      <div *ngIf="filterTypeSelected=='paymentAmount'" class="form-group ml-3">
         <label for="minAmountInput">Min. Amount</label>
-        <input type="number" class="form-control" id="minAmountInput" [(ngModel)]="minAmountFilter" name="minAmountInput">
+        <input type="number" class="form-control" id="minAmountInput" [(ngModel)]="minAmountFilter"
+          name="minAmountInput">
       </div>
 
-      <div *ngIf="filterTypeString=='paymentAmount'" class="form-group ml-3">
+      <div *ngIf="filterTypeSelected=='paymentAmount'" class="form-group ml-3">
         <label for="maxAmountInput">Max. Amount</label>
-        <input type="number" class="form-control" id="maxAmountInput" [(ngModel)]="maxAmountFilter" name="maxAmountInput">
+        <input type="number" class="form-control" id="maxAmountInput" [(ngModel)]="maxAmountFilter"
+          name="maxAmountInput">
       </div>
 
-      <div *ngIf="filterTypeString=='paymentCategory'" class="ml-5">
+      <div *ngIf="filterTypeSelected=='paymentCategory'" class="ml-5">
         <label>Select Payment Categories: </label>
         <div *ngFor="let category of paymentCategories">
           <div class="form-check">
@@ -227,7 +227,7 @@
         </div>
       </div>
 
-      <div *ngIf="filterTypeString=='paymentEntity'" class="ml-5">
+      <div *ngIf="filterTypeSelected=='paymentEntity'" class="ml-5">
         <label>Select Payment Entities: </label>
         <div *ngFor="let entity of paymentEntities">
           <div class="form-check">
@@ -239,7 +239,7 @@
         </div>
       </div>
 
-      <div *ngIf="filterTypeString=='paymentMode'" class="ml-5">
+      <div *ngIf="filterTypeSelected=='paymentMode'" class="ml-5">
         <label>Select Payment Modes: </label>
         <div *ngFor="let mode of paymentModes">
           <div class="form-check">
@@ -257,15 +257,17 @@
       <h6>{{errorMsg}}</h6>
     </div>
     <button class="btn btn-outline-secondary" (click)="closeAddEditFilterModal()">Close</button>
-    <button *ngIf="filterTypeString!=''" (click)="addFilter(filterTypeString)"
+    <button *ngIf="filterTypeSelected!=''" (click)="addFilter(filterTypeSelected)"
       class="btn btn-primary ml-3">Submit</button>
   </div>
 </ng-template>
 
-<ng-template #filtersModal>
+
+
+<ng-template #manageFiltersModal>
   <div class="modal-header">
     <h4 class="modal-title pull-left ml-3">Manage Filters</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="closeFilterModal()">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeManageFiltersModal()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -301,7 +303,8 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-outline-secondary" (click)="closeFilterModal()">Close</button>
+    <h6 *ngIf="allFiltersSelectedBoolean" class="mr-3 text-primary">All the filters can be applied once. Click on the yellow badge to edit</h6>
+    <button class="btn btn-outline-secondary" (click)="closeManageFiltersModal()">Close</button>
     <button *ngIf="filtersApplied.length>0" class="btn btn-outline-info" data-toggle="tooltip" data-placement="bottom"
       title="Sets the originally applied Filter(s)" (click)="resetFilters()">Reset</button>
     <button *ngIf="filtersSelected.length==0 && filtersApplied.length==0" class="btn btn-primary" disabled
