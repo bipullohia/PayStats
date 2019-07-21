@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaymentService } from 'src/app/service/payment.service';
 import { Payment } from 'src/app/model/payment';
+import { ManageService } from 'src/app/service/manage.service';
+import { PaymentEntity, PaymentCategory, PaymentMode } from 'src/app/model/manage';
 
 @Component({
   selector: 'app-add-payment',
@@ -14,24 +16,58 @@ export class AddPaymentComponent implements OnInit {
   paymentCopy: Payment;
   isEditing: boolean;
   addLogo: string;
+  paymentEntities: PaymentEntity[];
+  paymentCategories: PaymentCategory[];
+  paymentModes: PaymentMode[];
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private paymentService: PaymentService,
+    private manageService: ManageService,
     private router: Router
   ) {
     this.addLogo = "assets/images/add.png";
   }
 
   ngOnInit() {
+
+    this.getAllPaymentCategory();
+    this.getAllPaymentEntity();
+    this.getAllPaymentModes();
+
     this.payment = new Payment();
     this.isEditing = false;
-
     this.loadExistingPayment();
     if(!this.isEditing){
-      
       this.payment.dateOfTransaction = this.getCurrentDate();
     }
+  }
+
+  getAllPaymentEntity() {
+    this.paymentEntities = [];
+    this.manageService.getAllPaymentEntity().subscribe(
+      (data) => {
+        this.paymentEntities = data;
+      }
+    );
+  }
+
+  getAllPaymentCategory() {
+    this.paymentCategories = [];
+    this.manageService.getAllPaymentCategory().subscribe(
+      (data) => {
+        this.paymentCategories = data;
+      }
+    );
+  }
+
+  getAllPaymentModes() {
+    this.paymentModes = [];
+    this.manageService.getAllPaymentMode().subscribe(
+      (data) => {
+        this.paymentModes = data;
+      }
+    );
   }
 
   getCurrentDate(){

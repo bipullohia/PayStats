@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Http, RequestOptions, Headers, Response } from '@angular/http';
+import {HttpClient} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators'
 import { Payment } from '../model/payment';
+import { Filter } from '../model/manage';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +12,10 @@ import { Payment } from '../model/payment';
 export class PaymentService {
   baseUrl : string;
 
-  constructor(private http : Http) {
+  constructor(
+    private http : Http,
+    private httpClient: HttpClient
+    ) {
     this.baseUrl = "http://localhost:7777/payments";
    }
 
@@ -64,4 +69,13 @@ export class PaymentService {
        map(data => data.json())
      );
    }
+
+   getFilteredPayments(filters: Filter[]): Payment[]{
+    let filteredPayment: Payment[] = [];
+    this.httpClient.post(this.baseUrl+"/filters", filters).subscribe((payments: Payment[])=> {
+      payments.forEach(p => filteredPayment.push(p));
+    });
+    return filteredPayment;
+   }
+   
 }
