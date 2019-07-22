@@ -1,5 +1,6 @@
 package com.bipullohia.paystat.restapi;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bipullohia.paystat.model.Payment;
+import com.bipullohia.paystat.model.PaymentFilter;
 import com.bipullohia.paystat.service.PaymentService;
 
 @RestController
@@ -113,5 +115,14 @@ public class PaymentApi {
 			resp = new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		
 		return resp;
+	}
+	
+	@PostMapping("/filters")
+	public List<Payment> getFilteredPayments(@RequestBody PaymentFilter[] paymentFilter){
+		System.out.println(paymentFilter);
+		List<Payment> payments = new ArrayList<Payment>();
+		payments = paymentService.getFilteredPayments(paymentFilter);
+		System.out.println(payments.size() + " : filtered payment array result size");
+		return payments;
 	}
 }

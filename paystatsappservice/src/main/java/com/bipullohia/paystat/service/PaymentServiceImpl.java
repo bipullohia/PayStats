@@ -1,5 +1,6 @@
 package com.bipullohia.paystat.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.bipullohia.paystat.dao.PaymentRepository;
 import com.bipullohia.paystat.model.Payment;
+import com.bipullohia.paystat.model.PaymentFilter;
+import com.bipullohia.paystat.specification.PaymentSpecification;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -61,4 +64,17 @@ public class PaymentServiceImpl implements PaymentService {
 		return paymentRepo.findAllByPayType(payType);
 	}
 
+	@Override
+	public List<Payment> getFilteredPayments(PaymentFilter[] paymentFilters) {
+		List<PaymentFilter> paymentFiltersList = new ArrayList<PaymentFilter>();
+		for(PaymentFilter PaymentFilter : paymentFilters) {
+			paymentFiltersList.add(PaymentFilter);
+		}
+		PaymentSpecification paymentSpecification = new PaymentSpecification(paymentFiltersList);
+		List<Payment> filteredPayments = new ArrayList<Payment>();
+		paymentRepo.findAll(paymentSpecification).forEach((payment) -> {
+			filteredPayments.add(payment);
+		});
+		return filteredPayments;
+	}
 }

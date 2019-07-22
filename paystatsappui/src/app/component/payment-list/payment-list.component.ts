@@ -341,10 +341,9 @@ export class PaymentListComponent implements OnInit {
         this.filtersApplied.push(filter);
       }
     }
-    let payment: Payment[];
-    payment = this.paymentService.getFilteredPayments(this.filtersApplied);
-    console.log(payment.length + " : length of payment");
-    
+    this.paymentService.getFilteredPayments(this.filtersApplied).subscribe((data: any[]) => {
+      this.payments = data as Payment[];
+    });
     this.closeManageFiltersModal();
   }
 

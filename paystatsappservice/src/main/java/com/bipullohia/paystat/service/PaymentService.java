@@ -3,6 +3,7 @@ package com.bipullohia.paystat.service;
 import java.util.List;
 
 import com.bipullohia.paystat.model.Payment;
+import com.bipullohia.paystat.model.PaymentFilter;
 
 public interface PaymentService {
 
@@ -14,4 +15,6 @@ public interface PaymentService {
 	
 	boolean existsById(int payid);
 	List<Payment> findAllByPayType(String payType);
+	
+	List<Payment> getFilteredPayments(PaymentFilter[] paymentFilter);
 }

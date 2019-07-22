@@ -70,12 +70,8 @@ export class PaymentService {
      );
    }
 
-   getFilteredPayments(filters: Filter[]): Payment[]{
+   getFilteredPayments(filters: Filter[]): Observable<any>{
     let filteredPayment: Payment[] = [];
-    this.httpClient.post(this.baseUrl+"/filters", filters).subscribe((payments: Payment[])=> {
-      payments.forEach(p => filteredPayment.push(p));
-    });
-    return filteredPayment;
+    return this.httpClient.post(this.baseUrl+"/filters", filters);
    }
-   
 }
