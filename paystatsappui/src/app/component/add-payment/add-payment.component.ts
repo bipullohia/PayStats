@@ -16,6 +16,7 @@ export class AddPaymentComponent implements OnInit {
   paymentCopy: Payment;
   isEditing: boolean;
   addLogo: string;
+  paymentDate: Date;
   paymentEntities: PaymentEntity[];
   paymentCategories: PaymentCategory[];
   paymentModes: PaymentMode[];
@@ -38,8 +39,9 @@ export class AddPaymentComponent implements OnInit {
     this.payment = new Payment();
     this.isEditing = false;
     this.loadExistingPayment();
+
     if(!this.isEditing){
-      this.payment.dateOfTransaction = this.getCurrentDate();
+      this.paymentDate = new Date();
     }
   }
 
@@ -70,8 +72,7 @@ export class AddPaymentComponent implements OnInit {
     );
   }
 
-  getCurrentDate(){
-    let date = new Date();
+  getCurrentDate(date: Date){
     let day = (date.getDate()<10 ? "0"+date.getDate() : date.getDate());
     let month = (date.getMonth()<10 ? "0"+(date.getMonth()+1) : (date.getMonth()+1));
     let dateString = date.getFullYear() + "-" + month + "-" + day;
@@ -87,6 +88,7 @@ export class AddPaymentComponent implements OnInit {
             (data) => {
               this.payment = data;
               this.isEditing = true;
+              this.paymentDate = new Date(this.payment.dateOfTransaction);
             }
           );
         }
@@ -99,6 +101,7 @@ export class AddPaymentComponent implements OnInit {
     if (this.payment.description == null || this.payment.description == "") {
       this.payment.description = this.payment.title;
     }
+    this.payment.dateOfTransaction = this.getCurrentDate(this.paymentDate);
     if (this.isEditing) {
       this.paymentService.updatePayment(this.payment).subscribe(
         (data) => {
@@ -128,5 +131,6 @@ export class AddPaymentComponent implements OnInit {
 
   resetValues() {
     this.payment = new Payment;
+    this.paymentDate = new Date();
   }
 }

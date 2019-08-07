@@ -47,11 +47,10 @@
         </div>
 
         <div class="row">
-
           <div class="form-group col-sm-4">
             <label for="dateOfTransaction">Date of Transaction*</label>
-            <input type="date" class="form-control" id="dateOfTransaction" name="dateOfTransaction" required
-              [(ngModel)]="payment.dateOfTransaction">
+              <input type="text" placeholder="Datepicker" [bsValue]="paymentDate" [(ngModel)]="paymentDate" name="dateOfTransaction"
+              [bsConfig]="{ dateInputFormat: 'DD-MM-YYYY' }" class="form-control" bsDatepicker>
           </div>
 
           <div class="form-group col-sm-4">

@@ -1,6 +1,9 @@
 <div class="container mt-2">
   <div class="mb-4 mt-4 border-bottom border-dark heading-border  clearfix">
-    <h4 class="float-left">View Payments </h4>
+    <div class="float-left">
+      <h4 >View Payments </h4>
+      <p>Showing {{payments.length>0 ? payments.length : 0}} results</p>
+    </div>
     <div class="float-right mb-2">
       <button class="btn btn-info mr-3" (click)="viewManageFiltersModal(manageFiltersModal)">Manage Filters</button>
       <div class="btn-group" dropdown>
