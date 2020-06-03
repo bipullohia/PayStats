@@ -1,10 +1,15 @@
 package com.bipullohia.paystat.specification;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -49,8 +54,27 @@ public class PaymentSpecification implements Specification<Payment> {
 	
 	public Predicate getPredicateForPaymentDate(CriteriaBuilder builder, Root<?> root, PaymentFilter paymentFilter) {
 		final Predicate predicate = builder.disjunction();
-		predicate.getExpressions().add(builder.and(builder.greaterThanOrEqualTo(root.get("date"), Integer.valueOf(paymentFilter.getFilterValues()[0])), 
-				builder.lessThanOrEqualTo(root.get("date"), Integer.valueOf(paymentFilter.getFilterValues()[1]))));
+		
+		System.out.println(paymentFilter.getFilterValues()[0].toString());		
+		System.out.println(paymentFilter.getFilterValues()[1].toString());
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+		
+		
+		try {
+			Date startDate = dateFormat.parse((paymentFilter.getFilterValues()[0]));
+			Date endDate = dateFormat.parse(paymentFilter.getFilterValues()[1]);
+			
+			System.out.println(startDate + " start");
+			System.out.println(endDate);
+			System.out.println(root.get("dateOfTransaction").getAlias());
+			System.out.println(root.get("dateOfTransaction").toString());
+			Path<Date> st = root.get("dateOfTransaction");
+			
+			predicate.getExpressions().add(builder.and(builder.greaterThanOrEqualTo(st, startDate), 
+					builder.lessThanOrEqualTo(st, endDate)));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		return predicate;
 	}
 	
