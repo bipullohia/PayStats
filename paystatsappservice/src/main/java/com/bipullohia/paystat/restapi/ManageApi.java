@@ -13,14 +13,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bipullohia.paystat.helper.CSVHelper;
 import com.bipullohia.paystat.model.PaymentCategory;
 import com.bipullohia.paystat.model.PaymentEntity;
 import com.bipullohia.paystat.model.PaymentMode;
 import com.bipullohia.paystat.service.PaymentCategoryService;
 import com.bipullohia.paystat.service.PaymentEntityService;
 import com.bipullohia.paystat.service.PaymentModeService;
+import com.bipullohia.paystat.vo.TransactionVO;
 
 @RestController
 @CrossOrigin
@@ -36,6 +39,14 @@ public class ManageApi {
 	@Autowired
 	private PaymentModeService paymentModeService;
 	
+	@GetMapping("/syncSheetToDB")
+	public ResponseEntity<Void> syncSheetValuestoDB(@RequestParam("sheetName") String sheetName) {
+		CSVHelper csvHelper = new CSVHelper();
+		List<TransactionVO> list = null;
+		list = csvHelper.getAllTransactionsFromSheet(sheetName);
+		System.out.println("SheetName: " + sheetName + "List Count: " + list.size());
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 	
 	@GetMapping("/{option}/all")
 	public ResponseEntity<List<?>> getAllValues(@PathVariable("option") String option){

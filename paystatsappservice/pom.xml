@@ -13,7 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>paystatsapp-service</name>
-	<description>Service project for PayStat</description>
+	<description>Service project for PayStats</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -52,6 +52,30 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Dependencies for connecting to Google Spreadsheets
+		<dependency>
+		    <groupId>com.google.api-client</groupId>
+		    <artifactId>google-api-client</artifactId>
+		    <version>1.23.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.oauth-client</groupId>
+		    <artifactId>google-oauth-client-jetty</artifactId>
+		    <version>1.23.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.apis</groupId>
+		    <artifactId>google-api-services-sheets</artifactId>
+		    <version>v4-rev493-1.23.0</version>
+		</dependency> -->
+		
+		<dependency> 
+   			<groupId>com.opencsv</groupId> 
+    		<artifactId>opencsv</artifactId> 
+    		<version>4.1</version> 
+		</dependency>
+		
 	</dependencies>
 
 	<build>
