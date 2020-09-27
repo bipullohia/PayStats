@@ -22,7 +22,7 @@ import com.bipullohia.paystats.service.PaymentsService;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value="/paymentsold")
+@RequestMapping(value="/payments")
 public class PaymentApi {
 
 	@Autowired
