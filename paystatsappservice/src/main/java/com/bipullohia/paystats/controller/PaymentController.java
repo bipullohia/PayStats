@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bipullohia.paystats.entity.Payment;
 import com.bipullohia.paystats.model.PaymentVO;
 import com.bipullohia.paystats.service.PaymentService;
 
@@ -30,15 +29,15 @@ public class PaymentController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Payment> addPayment(@RequestBody PaymentVO paymentVO){
+	public ResponseEntity<PaymentVO> addPayment(@RequestBody PaymentVO paymentVO){
 		
-		ResponseEntity<Payment> resp = null;
-		Payment respPay = paymentService.addPayment(paymentVO);
+		ResponseEntity<PaymentVO> resp = null;
+		PaymentVO respPay = paymentService.addPayment(paymentVO);
 		if(respPay==null) {
-			resp = new ResponseEntity<Payment>(HttpStatus.BAD_REQUEST);
+			resp = new ResponseEntity<PaymentVO>(HttpStatus.BAD_REQUEST);
 		}else {
 			System.out.println(respPay);
-			resp = new ResponseEntity<Payment>(respPay, HttpStatus.OK);
+			resp = new ResponseEntity<PaymentVO>(respPay, HttpStatus.OK);
 		}
 		
 		return resp;

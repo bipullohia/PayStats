@@ -1,9 +1,10 @@
 package com.bipullohia.paystats.dao;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class RefCodeRepository {
+import com.bipullohia.paystats.entity.RefCode;
 
-	
+
+public interface RefCodeRepository extends JpaRepository<RefCode, RefCode.RefCodeId>{
+
 }

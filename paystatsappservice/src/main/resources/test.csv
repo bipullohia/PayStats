@@ -1,6 +1,10 @@
-Date ,Description,Category,Amount,Type
+Date,Description,Category,Amount,Type
 ,,,,
-01/08/2018,To Aditya for Food,OutsideFood,110,Debit
-02/08/2018,To Akku for BLR trip,Travel,2522,Debit
-07/08/2018,Dinner Swiggy,OutsideFood,200,Debit
-09/08/2018,Ola bike,Transport,56,Debit
+01-08-2018,To Aditya for Food,OutsideFood,110,Debit
+02-08-2018,To Akku for BLR trip,Travel,2522,Debit
+07-08-2018,Dinner Swiggy,OutsideFood,200,Debit
+09-08-2018,Ola bike,Transport,56,Debit
+10-08-2018,Wifi C310,Utilities,400,Debit
+10-08-2018,Ola bike,Transport,73,Debit
+10-08-2018,Furlenco Furniture,Utilities,1000,Debit
+12-08-2018,Shruti Book Amazon,Family,478,Debit

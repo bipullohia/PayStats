@@ -35,15 +35,10 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	@Override
-	public Payment addPayment(PaymentVO paymentVO) {
-		
-		//PaymentVO respPayVO = null;
-		Payment payment = paymentHelper.convertPaymentVOToPaymentEntity(paymentVO);
-		Payment pay2 = paymentRepo.save(payment);
-		//return paymentRepo.save(payment);
-		//respPayVO = paymentHelper.convertPaymentEntityToPaymentVO(pay2);
-		return pay2;
+	public PaymentVO addPayment(PaymentVO paymentVO) {
+		Payment paymentResp = paymentRepo.save(paymentHelper.convertPaymentVOToPaymentEntity(paymentVO));
+		PaymentVO respPaymentVO = paymentHelper.convertPaymentEntityToPaymentVO(paymentResp);
+		return respPaymentVO;
 	}
-
 
 }

@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -34,6 +36,7 @@ public class Payment {
 	private String payType;
 	
 	@NotNull(message="Payment transaction date cannot be empty")
+	@Temporal(TemporalType.DATE) //helps to put only date related data into the DB and not time info
 	private Date transactionDate;
 	
 	@UpdateTimestamp

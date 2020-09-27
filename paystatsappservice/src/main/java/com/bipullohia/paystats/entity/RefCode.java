@@ -77,6 +77,9 @@ public class RefCode {
 		private String codeType;
 		private String codeValue;
 		
+		public RefCodeId() {
+		}
+		
 		public RefCodeId(String codeType, String codeValue) {
 			this.codeType = codeType;
 			this.codeValue = codeValue;
