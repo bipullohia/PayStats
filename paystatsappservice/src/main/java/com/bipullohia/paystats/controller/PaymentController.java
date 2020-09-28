@@ -47,6 +47,41 @@ public class PaymentController {
 		return resp;
 	}
 	
+	@GetMapping
+	public ResponseEntity<List<PaymentVO>> getAllPaymentsBySearch(
+			@RequestParam("searchField") String searchField,
+			@RequestParam("searchValue") String searchValue
+			){
+		ResponseEntity<List<PaymentVO>> resp = null;
+		
+		switch(searchField) {
+		case "PayCategory":
+			List<PaymentVO> listOfPayByCategory = paymentService.findAllByCategory(searchValue);
+			
+			if(listOfPayByCategory != null && listOfPayByCategory.size()>0)
+				resp = new ResponseEntity<>(listOfPayByCategory, HttpStatus.OK);
+			else
+				resp = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			break;
+			
+		case "PayType":
+			List<PaymentVO> listOfPayByType = paymentService.findAllByPayType(searchValue);
+			
+			if(listOfPayByType != null && listOfPayByType.size()>0)
+				resp = new ResponseEntity<>(listOfPayByType, HttpStatus.OK);
+			else
+				resp = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			break;
+		
+		default:
+			resp = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			break;
+		}
+		
+		return resp;
+	}
+	
+	
 	@GetMapping("/syncSheetToDB")
 	public ResponseEntity<SyncInfoVO> syncSheetValuestoDB(@RequestParam("sheetName") String sheetName) {
 		CSVHelper csvHelper = new CSVHelper();

@@ -41,4 +41,26 @@ public class PaymentServiceImpl implements PaymentService {
 		return respPaymentVO;
 	}
 
+	@Override
+	public List<PaymentVO> findAllByPayType(String payType) {
+		List<Payment> payments = paymentRepo.findAllByPayType(payType);
+		List<PaymentVO> listOfPaymentVO = new ArrayList<>();
+		for(Payment payment : payments) {
+			PaymentVO paymentVO = paymentHelper.convertPaymentEntityToPaymentVO(payment);
+			listOfPaymentVO.add(paymentVO);
+		}
+		return listOfPaymentVO;
+	}
+
+	@Override
+	public List<PaymentVO> findAllByCategory(String category) {
+		List<Payment> payments = paymentRepo.findAllByCategory(category);
+		List<PaymentVO> listOfPaymentVO = new ArrayList<>();
+		for(Payment payment : payments) {
+			PaymentVO paymentVO = paymentHelper.convertPaymentEntityToPaymentVO(payment);
+			listOfPaymentVO.add(paymentVO);
+		}
+		return listOfPaymentVO;
+	}
+
 }

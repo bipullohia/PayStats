@@ -9,5 +9,8 @@ public interface PaymentService {
 	List<PaymentVO> getAllPayment();
 	PaymentVO addPayment(PaymentVO paymentVO);
 	
+	List<PaymentVO> findAllByPayType(String payType);
+	List<PaymentVO> findAllByCategory(String category);
+	
 }
 
