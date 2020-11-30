@@ -7,6 +7,7 @@ import com.bipullohia.paystats.model.Enums.PaymentType;
 
 public class PaymentVO {
 
+	private int id;
 	private String payDescription;
 	private PaymentCategory category;
 	private int amount;
@@ -14,7 +15,14 @@ public class PaymentVO {
 	//private Date transactionDate;
 	private String transactionDate;
 	
-	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getPayDescription() {
 		return payDescription;
 	}

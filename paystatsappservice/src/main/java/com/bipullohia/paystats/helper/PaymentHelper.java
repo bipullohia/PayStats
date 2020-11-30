@@ -15,6 +15,7 @@ public class PaymentHelper {
 	public PaymentVO convertPaymentEntityToPaymentVO(Payment paymentEntity) {
 
 		PaymentVO paymentVO = new PaymentVO();
+		paymentVO.setId(paymentEntity.getId());
 		paymentVO.setAmount(paymentEntity.getAmount());
 		paymentVO.setCategory(PaymentCategory.valueOf(paymentEntity.getCategory()));
 		paymentVO.setPayDescription(paymentEntity.getPayDescription());
