@@ -4,7 +4,7 @@ import gridViewLogo from './assets/grid-view.png';
 import listViewLogo from './assets/list-view.png';
 import axios from 'axios';
 
-import { Container, Row, Col, Card, Navbar, Nav, NavDropdown, Button, DropdownButton, Dropdown, ButtonGroup, Image, ListGroup, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Navbar, Nav, NavDropdown, Button, DropdownButton, Dropdown, ButtonGroup, Image, ListGroup, Modal, Badge } from 'react-bootstrap';
 
 
 
@@ -39,9 +39,12 @@ function SubContainer(){
     //All the state hooks
     const [payments, setPayments] = useState([]);
     const [sortingType, setSortingType] = useState('Sort By: ');
+    const [isListView, setIsListView] = useState(true);
+    const [filterCount, setFilterCount] = useState(0);
 
     //Modal State Hooks
     const [show, setShow] = useState(false);
+    const [modalShow, setModalShow] = useState(false);
 
     //Effect hook to load all the payments
     useEffect(() => {
@@ -100,20 +103,23 @@ function SubContainer(){
                    <div className="float-right mb-2">
                         <ButtonGroup>
                             <Button variant="outline-warning mr-2">Go to Dashboard</Button>
-                            <Button variant="outline-danger mr-2" onClick={handleShow}>Manage Filters</Button>
-                            <DropdownButton as={ButtonGroup} variant="outline-info" title={sortingType} id="btn-grp-filter-sort" onSelect={function(evt){sortArray(evt)}}>
-                                <Dropdown.Item eventKey="recentPaymentFirst" href="#/action-1">Recent Payment First</Dropdown.Item>
-                                <Dropdown.Item eventKey="oldestPaymentFirst" href="#/action-2">Oldest Payment First</Dropdown.Item>
-                                <Dropdown.Item eventKey="paymentAmountLowToHigh" href="#/action-4">Payment Amount: Low to High</Dropdown.Item>
-                                <Dropdown.Item eventKey="paymentAmountHighToLow" href="#/action-5">Payment Amount: High to Low</Dropdown.Item>
+                            {/* <Button variant="outline-danger mr-2" onClick={handleShow}>Manage Filters</Button> */}
+                            <Button variant="outline-danger mr-2" onClick={() => {setModalShow(true)}}>Apply Filters <Badge variant="danger">{filterCount}</Badge></Button>
+                            <DropdownButton as={ButtonGroup} variant="outline-info" title={sortingType} id="btn-grp-filter-sort" onSelect={(evt) => sortArray(evt)}>
+                                <Dropdown.Item eventKey="recentPaymentFirst">Recent Payment First</Dropdown.Item>
+                                <Dropdown.Item eventKey="oldestPaymentFirst">Oldest Payment First</Dropdown.Item>
+                                <Dropdown.Item eventKey="paymentAmountLowToHigh">Payment Amount: Low to High</Dropdown.Item>
+                                <Dropdown.Item eventKey="paymentAmountHighToLow">Payment Amount: High to Low</Dropdown.Item>
                         </DropdownButton>
                         </ButtonGroup>
 
-                        <img src={gridViewLogo} alt="gridViewLogo" className="img-icon mr-2 ml-3 img-thumbnail"/>
-                        <img src={listViewLogo} alt="listViewLogo" className="img-icon img-thumbnail"/>
+                        <img src={gridViewLogo} alt="gridViewLogo" className="img-icon mr-2 ml-3 img-thumbnail" 
+                            data-toggle="tooltip" data-placement="bottom" title="Grid View" onClick={() => {setIsListView(false)}}/>
+                        <img src={listViewLogo} alt="listViewLogo" className="img-icon img-thumbnail" 
+                            data-toggle="tooltip" data-placement="bottom" title="List View" onClick={() => {setIsListView(true)}}/>
                     </div>
                </div>
-               {printPaymentList(payments)}
+               {isListView ? printPaymentList(payments) : printPaymentListGrid(payments)}
             </Container>
             
             <>
@@ -124,11 +130,10 @@ function SubContainer(){
                 keyboard={false}
                 >
                 <Modal.Header closeButton>
-                    <Modal.Title>Manage Filter</Modal.Title>
+                    <Modal.Title>Add Filter</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    I will not close if you click outside me. Don't even try to press
-                    escape key.
+                    Select one filter from the following dropdown:
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
@@ -138,49 +143,116 @@ function SubContainer(){
                 </Modal.Footer>
                 </Modal>
             </>
+
+            <>
+                <MyVerticallyCenteredModal
+                    show={modalShow}
+                    onHide={() => setModalShow(false)}
+                    backdrop="static"
+                    keyboard={false}
+                    filterCount={filterCount}
+                    handleShow={handleShow}
+                />
+            </>
         </div>
     );   
 }
 
+function MyVerticallyCenteredModal(props) {
+    return (
+      <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            Manage Filters - Payments
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <h5 className="text-danger">Filters applied: {props.filterCount}</h5>
+          <p>
+            Select one or more filters from below to get payments according
+            to Payment Date, Amount, Category, Payment Type.
+          </p>
+          {/* <label className="ml-3"><span class="badge badge-pill badge-primary pb-2">Add New Filter
+          </span></label> */}
+          <Button variant="warning" className="rounded-button" onClick={props.handleShow}>Add Filter</Button>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={props.onHide}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
 
 
+//to return all the payments in UI in Grid Format
+function printPaymentListGrid(payments){
+    return (
+        <>
+            <Row>
+                {payments.map(payment => {
+                    return (
+                        <div className="col-sm-4 mb-4" key={payment.id}>
+                        <Card>
+                         <Card.Body>
+                         <div className="small mb-1">{payment.category}</div>
+                            <h6 className="card-title font-weight-bold">{payment.payDescription}</h6>
+                             <Card.Text>
+                                <div>Amount: ₹{payment.amount}</div>
+                                <div>{payment.payType === 'Credit' ? 'Received on: ' : 'Paid on: '} {getFormattedDate(payment.transactionDate)}</div>
+                             </Card.Text>
+                         </Card.Body>
+                     </Card>
+                     </div>
+                    );
+                })}    
+            </Row>
+        </>
+    );
+}
 
-//to return all the payments in UI
+//to return all the payments in UI in List Format
 function printPaymentList(payments){
     return (
         <>
-            {/* <div>{payments.map( d => <div>{JSON.stringify(d)}</div>)}</div> */}
             <ListGroup>
                 {payments.map(payment => {
                     return (
                     <ListGroup.Item key={payment.id}>
                         <span className="font-weight-bold mr-2">{payment.payDescription}</span>
                         <span className="mr-2 ml-2">|</span>
-                        {/* <span className="mr-2 ml-2">{payment.category}</span>
-                        <span className="mr-2 ml-2">|</span>
-                        <span className="mr-2 ml-2">₹{payment.amount}</span>
-                        <span className="mr-2 ml-2">|</span>
-                        <span className="mr-2 ml-2">{payment.payType}</span> */}
                         <span className="mr-2 ml-2">{payment.payType === 'Credit' ? 'Received ' : 'Paid'} <span className="font-weight-bold">₹{payment.amount}</span> for {payment.category}</span>
-                        <span className="mr-2 ml-2 small" style={{float: 'right'}}>Paid on {payment.transactionDate}</span>
+                        <span className="mr-2 ml-2 small" style={{float: 'right'}}>{payment.payType === 'Credit' ? 'Received on ' : 'Paid on '}{getFormattedDate(payment.transactionDate)}</span>
                     </ListGroup.Item>
-
-                    // <Card border="primary" style={{ width: '18rem' }}>
-                    //     <Card.Header>{payment.payType}</Card.Header>
-                    //     <Card.Body>
-                    // <Card.Title>{payment.payDescription}</Card.Title>
-                    //         <Card.Text>
-                    //             Some quick example text to build on the card title and make up the bulk
-                    //             of the card's content.
-                    //         </Card.Text>
-                    //     </Card.Body>
-                    // </Card>
                     );
-                })}
+                })};
             </ListGroup>
         </>
     );
 }
+
+
+function getFormattedDate(dateString){
+    let months = [-1, 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    let splitDate = dateString.split('-');
+    /*
+        splitDate[0] = dd
+        splitDate[1] = MM
+        splitDate[2] = yyyy
+    */
+    return months[parseInt(splitDate[1], 10)] + ' ' + splitDate[0] + ', ' + splitDate[2];
+}
+
+
+export default MainContainer;
+
+
+
+
 
 //simple post using Fetch
 // function testFetchPost(){
@@ -208,6 +280,3 @@ function printPaymentList(payments){
 //     })
 //     .then(data => console.log(data));
 // }
-
-
-export default MainContainer;
