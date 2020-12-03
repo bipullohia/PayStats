@@ -26,19 +26,23 @@ function ViewPayments(){
      {
          "filterName": "date",
          "label": "Payment Date",
-         "isSelected": false  
+         "isSelected": false, 
+         "values": [] //[0] is startDate, [1] is endDate
      }, {
          "filterName": "amount",
          "label": "Payment Amount",
-         "isSelected": false  
+         "isSelected": false,  
+         "values": [0, 500] //[0] is minAmount, [1] is maxAmount
      }, {
          "filterName": "category",
          "label": "Payment Category",
-         "isSelected": false  
+         "isSelected": false,
+         "values": []  
      }, {
          "filterName": "type",
          "label": "Payment Type",
-         "isSelected": false  
+         "isSelected": false,
+         "values": []  
      }
  ]);
 
@@ -128,7 +132,7 @@ function ViewPayments(){
                 <Button variant="secondary" onClick={handleClose}>
                 Close
                 </Button>
-                <Button variant="primary" onClick={applyCurrentFilter}>Apply</Button>
+                <Button variant="primary" onClick={()=> {applyCurrentFilter()}}>Apply</Button>
             </Modal.Footer>
             </Modal>
         </>
@@ -142,13 +146,15 @@ function ViewPayments(){
                 filtercount={filterCount}
                 handleShow={handleShow}
                 filters={filters}
+                removeSelectedFilter={(filterName) => removeSelectedFilter(filterName)}
+                removeAllFilters={removeAllFilters}
             />
         </>
     </div>
     );
 
     function handleClose(){
-        removeCurrentFilter();        
+        setCurrentFilter('');    
         setShow(false);
     }
 
@@ -195,6 +201,18 @@ function ViewPayments(){
         setCurrentFilter(filterName);
     };
 
+    function addDateValueToFilter(isStartDate, value){
+        filters.map((filter)=>{
+            if(filter.filterName === 'date'){
+                if(isStartDate){
+                    filter.values[0] = value;
+                }else{
+                    filter.values[1] = value;
+                }
+            }
+        })
+    }
+
     function displayDateFilter(){
         return (
             // <DateRangePicker
@@ -205,19 +223,32 @@ function ViewPayments(){
             // ranges={state}
             // direction="horizontal"
             // />
-            <div>Assume a datepicker here :)</div>
+            <React.Fragment> 
+                <div className="ml-4">
+                    <label>Start date:</label>
+                    <div>
+                        <input type="date" id="start" name="trip-start" onChange={(e)=> {console.log(e.target.value); addDateValueToFilter(true, e.target.value)}}
+                        min="1900-01-01" max="2099-12-31">
+                        </input>
+                    </div>
+                </div>
+                <div className="ml-2">
+                    <label>End date:</label>
+                    <div>
+                        <input type="date" id="end" name="trip-end" onChange={(e)=> {console.log(e.target.value); addDateValueToFilter(false, e.target.value)}}
+                        min="1900-01-01" max="2099-12-31">
+                        </input>
+                    </div>
+                </div>
+            </React.Fragment>
         );
     };
 
-    function removeCurrentFilter(){
-        setCurrentFilter('');
-    }
-
     function applyCurrentFilter(){
-        //show latest applied filter count
-        setFilterCount((prevCount) => prevCount+1);
         //set the current filter as selected
         setCurrentFilterAsSelected();
+        //show latest applied filter count
+        updateFilterCount();
         //close modal and reset selected fields
         handleClose();
     }
@@ -233,8 +264,29 @@ function ViewPayments(){
     }
 
     function displayCheckboxFilter(values, filterType){
+        
+        function addCheckboxValueToFilter(isChecked, value){
+            if(isChecked){
+                //add item to the filter values
+                filters.map((filter)=>{
+                    if(filter.filterName == currentFilter){
+                        filter.values.push(value);
+                    }
+                });
+            }else{
+                //remove item from the filter values
+                filters.map((filter)=>{
+                    if(filter.filterName == currentFilter){
+                        if(filter.values.length>0){
+                            filter.values = filter.values.filter(f => f != value);
+                        }
+                    }
+                });
+            }
+        }
+        
         return (
-            <div class="ml-5">
+            <div className="ml-5">
             <label>Select {filterType}: </label>
             <div >
             <div className="form-check">
@@ -242,7 +294,7 @@ function ViewPayments(){
                     return (
                         <div key={value}>
                         <label className="form-check-label">
-                        <input type="checkbox" className="form-check-input" value={value}/>{value}
+                        <input type="checkbox" onClick={(e)=> {addCheckboxValueToFilter(e.target.checked, value)}} className="form-check-input" value={value}/>{value}
                         </label>   
                         </div> 
                     );
@@ -253,24 +305,61 @@ function ViewPayments(){
         );
     }
 
-    // function removeSelectedFilter(filterName){
+    function removeSelectedFilter(filterName){
+        filters.map((filter)=> {
+            if(filter.filterName === filterName){
+                filter.isSelected=false;
+            }
+        });
+        updateFilterCount();
+    }
 
-    // }
+    function removeAllFilters(){
+        filters.map((filter)=>{
+            filter.isSelected=false;
+        });
+        updateFilterCount();
+    }
 
-    // function removeAllFilters(){
+    function updateFilterCount(){
+        let count = 0;
+        filters.map((filter)=> {
+            if(filter.isSelected){
+                count++;
+            }
+        });
+        setFilterCount(count);
+    }
 
-    // }
-    
     function displayAmountFilter(){
+        let minMaxAmount = [];
+        filters.map((filter) => {
+            if(filter.filterName === 'amount'){
+                minMaxAmount = filter.values;
+            }
+        });
+
+        function setAmountValuesToFilter(isMinAmount, value){
+            filters.map((filter)=>{
+                if(filter.filterName == 'amount'){
+                    if(isMinAmount){
+                        filter.values[0] = value;
+                    }else{
+                        filter.values[1] = value;
+                    }
+                }
+            });
+        }
+
         return(
             <>
                 <div className="form-group ml-3">
                     <label>Min. Amount</label>
-                    <input type="number" className="form-control" id="minAmountInput" name="minAmountInput"/>
+                    <input type="number" className="form-control" id="minAmountInput" onChange={(e)=> setAmountValuesToFilter(true, e.target.value)} name="minAmountInput" defaultValue={minMaxAmount[0]}/>
                 </div>
                 <div className="form-group ml-3">
                     <label>Max. Amount</label>
-                    <input type="number" className="form-control" id="maxAmountInput" name="maxAmountInput"/>
+                    <input type="number" className="form-control" id="maxAmountInput" onChange={(e)=> setAmountValuesToFilter(false, e.target.value)} name="maxAmountInput" defaultValue={minMaxAmount[1]}/>
                 </div>
             </>                 
         );
@@ -363,9 +452,9 @@ function MyVerticallyCenteredModal(props) {
                 //for applied filters, show a badge-pill
                 if(filter.isSelected){
                     return(
-                        <Badge pill variant="warning" className="mb-4 mr-2">{filter.label}
+                        <Badge pill variant="warning" key={filter.filterName} className="mb-4 mr-2">{filter.label}: {filter.values.toString()}
                         <span className="show-pointer" data-toggle="tooltip" data-placement="bottom" 
-                            title="Remove this filter"onClick={() => console.log('Badge pill close button')} aria-hidden="true">&nbsp;&nbsp;&times;</span></Badge>
+                            title="Remove this filter" onClick={() => props.removeSelectedFilter(filter.filterName)} aria-hidden="true">&nbsp;&nbsp;&times;</span></Badge>
                     );
                 }
             })}
@@ -375,7 +464,7 @@ function MyVerticallyCenteredModal(props) {
             </p>
             <div>
                 <Button variant="warning" className="rounded-button" onClick={props.handleShow}>Add Filter</Button>
-                <Button variant="danger" className="rounded-button ml-2" onClick={() => console.log('Remove All filters!')}>Remove all Filters</Button>
+                <Button variant="danger" className="rounded-button ml-2" onClick={() => props.removeAllFilters()}>Remove all Filters</Button>
             </div>
             </Modal.Body>
         <Modal.Footer>
