@@ -5,8 +5,6 @@ import listViewLogo from '../assets/list-view.png';
 import axios from 'axios';
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
-import { DateRangePicker } from 'react-date-range';
-import { addDays } from 'date-fns';
 
 import { Container, Row, Card, Button, DropdownButton, Dropdown, ButtonGroup, ListGroup, Modal, Badge } from 'react-bootstrap';
 
@@ -21,13 +19,15 @@ function ViewPayments(){
  const [isListView, setIsListView] = useState(true);
  const [filterCount, setFilterCount] = useState(0);
  const [currentFilter, setCurrentFilter] = useState('');
+ const [isFilterValid, setIsFilterValid] = useState(true);
+ const [filterInvalidMsg, setFilterInvalidMsg] = useState('');
 
  const [filters, setFilters] = useState([
      {
          "filterName": "date",
          "label": "Payment Date",
          "isSelected": false, 
-         "values": [] //[0] is startDate, [1] is endDate
+         "values": [formatDate(7), formatDate(0)] //[0] is startDate, [1] is endDate (yyyy-mm-dd format)
      }, {
          "filterName": "amount",
          "label": "Payment Amount",
@@ -37,22 +37,14 @@ function ViewPayments(){
          "filterName": "category",
          "label": "Payment Category",
          "isSelected": false,
-         "values": []  
+         "values": [] //array contains all the selected categories
      }, {
          "filterName": "type",
          "label": "Payment Type",
          "isSelected": false,
-         "values": []  
+         "values": [] //array contains all the selected payTypes
      }
  ]);
-
- const [state, setState] = useState([
-     {
-       startDate: new Date(),
-       endDate: addDays(new Date(), 7),
-       key: 'selection'
-     }
-   ]);
 
  //Modal State Hooks
  const [show, setShow] = useState(false);
@@ -65,7 +57,6 @@ function ViewPayments(){
          setPayments(response.data);
      });
  }, []);
- 
 
     return(
         <div>
@@ -124,11 +115,12 @@ function ViewPayments(){
                     </select>
                 </div>
                 {currentFilter==='amount' ?  displayAmountFilter() : 
-                    (currentFilter==='date' ? displayDateFilter() : currentFilter==='category' ? displayCheckboxFilter(categories, 'Payment Categories') : 
-                    currentFilter==='type' ? displayCheckboxFilter(payTypes, 'Payment Types') : blankDOMElement())}
+                    (currentFilter==='date' ? displayDateFilter() : (currentFilter==='category' ? displayCheckboxFilter(categories, 'Payment Categories') : 
+                    (currentFilter==='type' ? displayCheckboxFilter(payTypes, 'Payment Types') : blankDOMElement())))}
             </div>
             </Modal.Body>
             <Modal.Footer>
+                {isFilterValid ?  null : printFilterValidationError()}
                 <Button variant="secondary" onClick={handleClose}>
                 Close
                 </Button>
@@ -148,18 +140,45 @@ function ViewPayments(){
                 filters={filters}
                 removeSelectedFilter={(filterName) => removeSelectedFilter(filterName)}
                 removeAllFilters={removeAllFilters}
+                printFilterLabels = {printFilterLabels}
             />
         </>
     </div>
     );
 
     function handleClose(){
-        setCurrentFilter('');    
+        setCurrentFilter('');   
+        setIsFilterValid(true);
+        setFilterInvalidMsg('');
         setShow(false);
     }
 
     function handleShow(){
         setShow(true);
+    }
+
+    function printFilterValidationError(){
+        return (
+        <h6 className="text-danger">{filterInvalidMsg}</h6>
+        );
+    }
+
+    function formatDate(noOfDaysFromToday) {
+        var d = new Date();
+        if(noOfDaysFromToday>0){
+            d = new Date(d.getTime() - (noOfDaysFromToday*24*60*60*1000));
+        }
+        
+        var month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+    
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+    
+        return [year, month, day].join('-');
     }
 
     function sortArray(sortType) {
@@ -198,6 +217,8 @@ function ViewPayments(){
     }
 
     function setFilterAsSelected(filterName){
+        setIsFilterValid(true);
+        setFilterInvalidMsg('');
         setCurrentFilter(filterName);
     };
 
@@ -213,21 +234,62 @@ function ViewPayments(){
         })
     }
 
+    function printFilterLabels(filterName){
+        let vals = filters.filter(f=>f.filterName===filterName)[0].values;
+        let filterLabel = '';
+        if(filterName === 'amount'){
+            filterLabel = '₹'+vals[0] + '  -  ' + '₹'+vals[1];
+        }else if(filterName === 'date'){
+            filterLabel = getFormattedDate(vals[0], 'yyyyMMdd') + '  -  ' + getFormattedDate(vals[1], 'yyyyMMdd')
+        }else{
+            //for filter - type and category
+            filterLabel = vals.toString();
+        }
+
+        return(
+            <>
+                <span>{filterLabel}</span>
+            </>
+        );
+    }
+
+    function setDefaultFilterValue(filterName){
+        //filterName will be 'all' for setting all the filter values to default
+        if(filterName === 'all'){
+            filters.map((filter)=>{
+                if(filter.filterName === 'amount'){
+                    filter.values = [0, 500];
+                }else if(filter.filterName === 'date'){
+                    filter.values = [formatDate(7), formatDate(0)]
+                }else{
+                    //valid for filters - category and type
+                    filter.values = []
+                }
+            });
+        }else{
+            //the scenario where we want to set default value for a particular filter
+            filters.map((filter)=>{
+                if(filter.filterName == filterName){
+                    if(filter.filterName === 'amount'){
+                        filter.values = [0, 500];
+                    }else if(filter.filterName === 'date'){
+                        filter.values = [formatDate(7), formatDate(0)]
+                    }else {
+                        //valid for filters - category and type
+                        filter.values = []
+                    }
+                }
+            })
+        }
+    }
+
     function displayDateFilter(){
         return (
-            // <DateRangePicker
-            // onChange={item => setState([item.selection])}
-            // showSelectionPreview={true}
-            // moveRangeOnFirstSelection={false}
-            // months={2}
-            // ranges={state}
-            // direction="horizontal"
-            // />
             <React.Fragment> 
                 <div className="ml-4">
                     <label>Start date:</label>
                     <div>
-                        <input type="date" id="start" name="trip-start" onChange={(e)=> {console.log(e.target.value); addDateValueToFilter(true, e.target.value)}}
+                        <input type="date" id="filterStartDate" name="trip-start" defaultValue={filters.filter(f => f.filterName==='date')[0].values[0]} onChange={(e)=> {addDateValueToFilter(true, e.target.value)}}
                         min="1900-01-01" max="2099-12-31">
                         </input>
                     </div>
@@ -235,7 +297,7 @@ function ViewPayments(){
                 <div className="ml-2">
                     <label>End date:</label>
                     <div>
-                        <input type="date" id="end" name="trip-end" onChange={(e)=> {console.log(e.target.value); addDateValueToFilter(false, e.target.value)}}
+                        <input type="date" id="filterEndDate" name="trip-end" defaultValue={filters.filter(f=>f.filterName==='date')[0].values[1]} onChange={(e)=> {addDateValueToFilter(false, e.target.value)}}
                         min="1900-01-01" max="2099-12-31">
                         </input>
                     </div>
@@ -245,12 +307,69 @@ function ViewPayments(){
     };
 
     function applyCurrentFilter(){
-        //set the current filter as selected
-        setCurrentFilterAsSelected();
-        //show latest applied filter count
-        updateFilterCount();
-        //close modal and reset selected fields
-        handleClose();
+        //do validations for the input value
+        if(validateFilterValues()){
+            //set the current filter as selected
+            setCurrentFilterAsSelected();
+            //show latest applied filter count
+            updateFilterCount();
+
+            //Call the backend to get proper data / Apply filter logic here
+
+            //reset selected fields and close modal
+            setCurrentFilter('');   
+            setIsFilterValid(true);
+            setFilterInvalidMsg('');
+            setShow(false);
+        }        
+    }
+
+    function validateFilterValues(){
+        let isValid = true;
+        if(currentFilter === ''){
+            isValid = false;
+            setIsFilterValid(false);
+            setFilterInvalidMsg('Atleast 1 filter should be selected to apply');
+        }else{
+            filters.map((filter)=>{
+                if(filter.filterName == currentFilter){
+                    //start validations according to a particular filter
+                    if(currentFilter === 'amount'){
+                        if(filter.values[0] === '' || filter.values[1] === '' || filter.values[0] < 0 || filter.values[1] < 0 ){
+                            setIsFilterValid(false);
+                            setFilterInvalidMsg('Invalid Input: The Amount value cannnot be empty or negative');
+
+                            //setting filter values to 0
+                            if(filter.values[0] === '' || filter.values[0] < 0){
+                                filter.values[0] = 0;
+                            }
+                            if(filter.values[1] === '' || filter.values[1] < 0){
+                                filter.values[1] = 0;
+                            }
+
+                            isValid = false;
+                        }
+                    }else if(currentFilter === 'date'){
+                        //handle it later
+                    }else if(currentFilter === 'category'){
+                        if(filter.values.length == 0){
+                            setIsFilterValid(false);
+                            setFilterInvalidMsg('Error: Atleast one option should be selected');
+                            isValid = false;
+                        }
+                    }else if(currentFilter === 'type'){
+                        if(filter.values.length == 0){
+                            setIsFilterValid(false);
+                            setFilterInvalidMsg('Error: Atleast one option should be selected');
+                            isValid = false;
+                        }
+                    }else{
+                        isValid = false;
+                    }
+                }
+            });
+        }
+        return isValid;
     }
 
     function setCurrentFilterAsSelected(){
@@ -311,6 +430,7 @@ function ViewPayments(){
                 filter.isSelected=false;
             }
         });
+        setDefaultFilterValue(filterName);
         updateFilterCount();
     }
 
@@ -318,6 +438,7 @@ function ViewPayments(){
         filters.map((filter)=>{
             filter.isSelected=false;
         });
+        setDefaultFilterValue('all');
         updateFilterCount();
     }
 
@@ -340,6 +461,7 @@ function ViewPayments(){
         });
 
         function setAmountValuesToFilter(isMinAmount, value){
+                
             filters.map((filter)=>{
                 if(filter.filterName == 'amount'){
                     if(isMinAmount){
@@ -367,7 +489,7 @@ function ViewPayments(){
     
     function blankDOMElement(){
         return (
-            <>HELLO
+            <>
             </>
         );
     }
@@ -386,7 +508,7 @@ function ViewPayments(){
                                 <h6 className="card-title font-weight-bold">{payment.payDescription}</h6>
                                 <Card.Text>
                                     <div>Amount: ₹{payment.amount}</div>
-                                    <div>{payment.payType === 'Credit' ? 'Received on: ' : 'Paid on: '} {getFormattedDate(payment.transactionDate)}</div>
+                                    <div>{payment.payType === 'Credit' ? 'Received on: ' : 'Paid on: '} {getFormattedDate(payment.transactionDate, 'ddMMyyyy')}</div>
                                 </Card.Text>
                             </Card.Body>
                         </Card>
@@ -409,7 +531,7 @@ function ViewPayments(){
                             <span className="font-weight-bold mr-2">{payment.payDescription}</span>
                             <span className="mr-2 ml-2">|</span>
                             <span className="mr-2 ml-2">{payment.payType === 'Credit' ? 'Received ' : 'Paid'} <span className="font-weight-bold">₹{payment.amount}</span> for {payment.category}</span>
-                            <span className="mr-2 ml-2 small" style={{float: 'right'}}>{payment.payType === 'Credit' ? 'Received on ' : 'Paid on '}{getFormattedDate(payment.transactionDate)}</span>
+                            <span className="mr-2 ml-2 small" style={{float: 'right'}}>{payment.payType === 'Credit' ? 'Received on ' : 'Paid on '}{getFormattedDate(payment.transactionDate, 'ddMMyyyy')}</span>
                         </ListGroup.Item>
                         );
                     })}
@@ -419,15 +541,27 @@ function ViewPayments(){
     }
 
 
-    function getFormattedDate(dateString){
+    function getFormattedDate(dateString, format){
         let months = [-1, 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         let splitDate = dateString.split('-');
+        
+       if(format === 'yyyyMMdd'){
         /*
+            splitDate[0] = yyyy
+            splitDate[1] = MM
+            splitDate[2] = dd
+        */
+        return months[parseInt(splitDate[1], 10)] + ' ' + splitDate[2] + ', ' + splitDate[0];
+       }else if(format === 'ddMMyyyy'){
+           /*
             splitDate[0] = dd
             splitDate[1] = MM
             splitDate[2] = yyyy
         */
         return months[parseInt(splitDate[1], 10)] + ' ' + splitDate[0] + ', ' + splitDate[2];
+       }
+        
+        
     }
     
 }
@@ -452,7 +586,7 @@ function MyVerticallyCenteredModal(props) {
                 //for applied filters, show a badge-pill
                 if(filter.isSelected){
                     return(
-                        <Badge pill variant="warning" key={filter.filterName} className="mb-4 mr-2">{filter.label}: {filter.values.toString()}
+                        <Badge pill variant="warning" key={filter.filterName} className="mb-4 mr-2">{filter.label}: {props.printFilterLabels(filter.filterName)}
                         <span className="show-pointer" data-toggle="tooltip" data-placement="bottom" 
                             title="Remove this filter" onClick={() => props.removeSelectedFilter(filter.filterName)} aria-hidden="true">&nbsp;&nbsp;&times;</span></Badge>
                     );
