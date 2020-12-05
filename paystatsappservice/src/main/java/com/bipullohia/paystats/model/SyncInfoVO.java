@@ -7,7 +7,8 @@ public class SyncInfoVO {
 	private String sheetName;
 	private int numOfRecordsInSheet;
 	private int numOfRecordsInserted;
-	private List<PaymentVO> listOfErrorRows;
+	private List<PaymentVO> listOfPaymentErrorRows;
+	private List<RefDataVO> listOfRefDataErrorRows;
 	
 	public String getSheetName() {
 		return sheetName;
@@ -27,12 +28,17 @@ public class SyncInfoVO {
 	public void setNumOfRecordsInserted(int numOfRecordsInserted) {
 		this.numOfRecordsInserted = numOfRecordsInserted;
 	}
-	public List<PaymentVO> getListOfErrorRows() {
-		return listOfErrorRows;
+	public List<PaymentVO> getListOfPaymentErrorRows() {
+		return listOfPaymentErrorRows;
 	}
-	public void setListOfErrorRows(List<PaymentVO> listOfErrorRows) {
-		this.listOfErrorRows = listOfErrorRows;
+	public void setListOfPaymentErrorRows(List<PaymentVO> listOfPaymentErrorRows) {
+		this.listOfPaymentErrorRows = listOfPaymentErrorRows;
 	}
-
+	public List<RefDataVO> getListOfRefDataErrorRows() {
+		return listOfRefDataErrorRows;
+	}
+	public void setListOfRefDataErrorRows(List<RefDataVO> listOfRefDataErrorRows) {
+		this.listOfRefDataErrorRows = listOfRefDataErrorRows;
+	}
 	
 }

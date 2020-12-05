@@ -22,11 +22,11 @@ public class PaymentServiceImpl implements PaymentService {
 	
 	@Override
 	public List<PaymentVO> getAllPayment() {
-		
 		List<Payment> allPayments = new ArrayList<>();
 		allPayments = paymentRepo.findAll();
 		
 		List<PaymentVO> listOfPaymentVO = new ArrayList<>();
+		
 		for(Payment payment : allPayments) {
 			PaymentVO paymentVO = paymentHelper.convertPaymentEntityToPaymentVO(payment);
 			listOfPaymentVO.add(paymentVO);
@@ -62,5 +62,21 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 		return listOfPaymentVO;
 	}
-
 }
+
+/*
+ * To figure out diff ref data/values (for ref data)
+ * 
+ * List<String> categories = new ArrayList<>();
+ * List<String> payTypes = new ArrayList<>();
+ * 
+ * if(categories.indexOf(payment.getCategory())==-1){
+	categories.add(payment.getCategory());
+	}
+ * if(payTypes.indexOf(payment.getPayType())==-1) {
+	payTypes.add(payment.getPayType());
+	}
+ *	
+ * System.out.println(categories.toString());
+ * System.out.println(payTypes.toString());
+ */

@@ -27,11 +27,13 @@ public class PaymentController {
 	@Autowired
 	private PaymentService paymentService;
 	
+	//TO get all the payments on the DB table
 	@GetMapping("/all")
 	public ResponseEntity<List<PaymentVO>> getAllPayments(){
 		return new ResponseEntity<List<PaymentVO>>(paymentService.getAllPayment(),HttpStatus.OK);
 	}
 	
+	//Adds new payment to the DB table (shouldn't be used as of now)
 	@PostMapping
 	public ResponseEntity<PaymentVO> addPayment(@RequestBody PaymentVO paymentVO){
 		
@@ -47,6 +49,7 @@ public class PaymentController {
 		return resp;
 	}
 	
+	//Get specific payments according to the search fields
 	@GetMapping
 	public ResponseEntity<List<PaymentVO>> getAllPaymentsBySearch(
 			@RequestParam("searchField") String searchField,
@@ -81,12 +84,12 @@ public class PaymentController {
 		return resp;
 	}
 	
-	
+	//sync the data on the sheet with the db table (right now it just pushes the payment rows to the DB table)
 	@GetMapping("/syncSheetToDB")
 	public ResponseEntity<SyncInfoVO> syncSheetValuestoDB(@RequestParam("sheetName") String sheetName) {
 		CSVHelper csvHelper = new CSVHelper();
 		List<PaymentVO> list = null;
-		list = csvHelper.getAllTransactionsFromSheet(sheetName);
+		list = csvHelper.getAllPaymentTransactionsFromSheet(sheetName);
 		System.out.println("SheetName: " + sheetName + ", List Count: " + list.size());
 		
 		List<PaymentVO> listOfErrorRows = new ArrayList<>();
@@ -106,7 +109,7 @@ public class PaymentController {
 		syncInfo.setSheetName(sheetName);
 		syncInfo.setNumOfRecordsInSheet(list.size());
 		syncInfo.setNumOfRecordsInserted(insertedRowCount);
-		syncInfo.setListOfErrorRows(listOfErrorRows);
+		syncInfo.setListOfPaymentErrorRows(listOfErrorRows);
 		System.out.println("Rows inserted: " + insertedRowCount);
 		return new ResponseEntity<SyncInfoVO>(syncInfo, HttpStatus.OK);
 	}

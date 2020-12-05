@@ -1,7 +1,5 @@
 package com.bipullohia.paystats.model;
 
-import java.util.Date;
-
 import com.bipullohia.paystats.model.Enums.PaymentCategory;
 import com.bipullohia.paystats.model.Enums.PaymentType;
 

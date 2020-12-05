@@ -1,0 +1,33 @@
+Sl. No,RefData Type,Value,Description,Status Flag
+,,,,
+1,EXPENSE_CATEGORY,Entertainment,"Music, art, movies, other forms of entertainment ",A
+2,EXPENSE_CATEGORY,Self,"On myself - personal products, personal care, hobbies",A
+3,EXPENSE_CATEGORY,Travel,Travel related expenses,A
+4,EXPENSE_CATEGORY,Education,"Books, Courses, learning",A
+5,EXPENSE_CATEGORY,Medical,Medical and health related expenses,A
+6,EXPENSE_CATEGORY,Transport,Any means of transport,A
+7,EXPENSE_CATEGORY,Shopping,"Spent on clothes, gadgets, items at home, etc.",A
+8,EXPENSE_CATEGORY,Utilities,"Bills and rent, etc.",A
+9,EXPENSE_CATEGORY,Grocery,"Veggies, fruits, other food items",A
+10,EXPENSE_CATEGORY,DailyNeeds,Anything other than groceries,A
+11,EXPENSE_CATEGORY,Snacks,Outside packed food / Junk food,A
+12,EXPENSE_CATEGORY,OutsideFood,Outside cooked food,A
+13,EXPENSE_CATEGORY,Family,Spent on family,A
+14,EXPENSE_CATEGORY,Friends,Spent on friends,A
+15,EXPENSE_CATEGORY,Investment,various investments,A
+16,EXPENSE_CATEGORY,Insurance,various insurances,A
+17,EXPENSE_CATEGORY,DebtRepay,Paying off the debt/loan,A
+18,EXPENSE_CATEGORY,Donation,Can contain gifts/donation,A
+19,EXPENSE_CATEGORY,TaxAndFees,Various Taxes or Fees/Charges paid,A
+20,EXPENSE_CATEGORY,CreditCard,Credit Card Payments,A
+21,EXPENSE_CATEGORY,Uncategorized,All the things which cannot be categorized,A
+22,INCOME_SOURCE,Paycheck,"Part of my paycheck (like Salary, etc.)",A
+23,INCOME_SOURCE,Bonus,Any extra money from the job or outside,A
+24,INCOME_SOURCE,Refund,Any refund from any source,A
+25,INCOME_SOURCE,Repayment,If I get money from someone whom I paid,A
+26,INCOME_SOURCE,Loan,"Any Loan taken from bank, person, etc.",A
+27,INCOME_SOURCE,InterestIncome,Income due to interest earned,A
+28,INCOME_SOURCE,Other,Anything else ,A
+29,PAYMENT_TYPE,Debit,Paid to others,A
+30,PAYMENT_TYPE,Credit,Received from others ,A
+31,PAYMENT_TYPE,Info,For record-keeping purposes,A
