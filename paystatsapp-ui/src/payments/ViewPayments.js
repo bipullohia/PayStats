@@ -53,7 +53,7 @@ function ViewPayments(){
  //Effect hook to load all the payments
  useEffect(() => {
      //fetching all the payments
-     axios.get(`http://localhost:7777/paymentss/all`).then((response) => {
+     axios.get(`http://localhost:7777/payments/all`).then((response) => {
          setPayments(response.data);
      });
  }, []);

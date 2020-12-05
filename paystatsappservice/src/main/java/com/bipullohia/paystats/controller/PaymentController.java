@@ -21,7 +21,7 @@ import com.bipullohia.paystats.service.PaymentService;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value="/paymentss")
+@RequestMapping(value="/payments")
 public class PaymentController {
 
 	@Autowired
