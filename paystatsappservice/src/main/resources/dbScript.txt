@@ -1,0 +1,40 @@
+CREATE TABLE `demoschema`.`REF_CODE` (
+  `CODE_DESC` VARCHAR(60) NOT NULL,
+  `CODE_TYPE` VARCHAR(30) NOT NULL,
+  `CODE_VALUE` VARCHAR(60) NOT NULL,
+  `STATUS_FLAG` CHAR(1) NOT NULL,
+  `CREATE_DT` DATE NOT NULL,
+  `LAST_UPDATE_TS` DATE NOT NULL,
+  PRIMARY KEY (`CODE_TYPE`, `CODE_VALUE`));
+
+  
+INSERT INTO demoschema.REF_CODE
+VALUES 
+('Debit transaction', 'TRANSACTION_TYPE', 'DB', 'A', '2020-08-10', '2020-08-10'),
+('Credit transaction', 'TRANSACTION_TYPE', 'CR', 'A', '2020-08-10', '2020-08-10'),
+('Info transaction', 'TRANSACTION_TYPE', 'INFO', 'A', '2020-08-10', '2020-08-10'),
+('Mainstream Income', 'INCOME_SOURCE', 'Paycheck', 'A', '2020-08-10', '2020-08-10'),
+('Unexpected/ Sudden Pay', 'INCOME_SOURCE', 'Bonus', 'A', '2020-08-10', '2020-08-10'),
+('Interest', 'INCOME_SOURCE', 'Interest', 'A', '2020-08-10', '2020-08-10'),
+('Savings Repay, etc.', 'INCOME_SOURCE', 'Savings', 'A', '2020-08-10', '2020-08-10'),
+('Money from Friends/Family', 'INCOME_SOURCE', 'Family&Friends', 'A', '2020-08-10', '2020-08-10'),
+('Repay by friend/family/colleagues', 'INCOME_SOURCE', 'Repayments', 'A', '2020-08-10', '2020-08-10'),
+('Offers/Refunds', 'INCOME_SOURCE', 'Refund', 'A', '2020-08-10', '2020-08-10'),
+('Lavish expenses, subscriptions, outings', 'EXPENSE_CATEGORY', 'Leisure&Entertainment', 'A', '2020-08-10', '2020-08-10'),
+('Books, hobbies, growth related', 'EXPENSE_CATEGORY', 'Hobby&Self', 'A', '2020-08-10', '2020-08-10'),
+('Self Travelling', 'EXPENSE_CATEGORY', 'Travel', 'A', '2020-08-10', '2020-08-10'),
+('Grocery, healthy food @ home', 'EXPENSE_CATEGORY', 'Grocery', 'A', '2020-08-10', '2020-08-10'),
+('On family members, related stuff', 'EXPENSE_CATEGORY', 'Family', 'A', '2020-08-10', '2020-08-10'),
+('House/Personal essentials', 'EXPENSE_CATEGORY', 'Essentials', 'A', '2020-08-10', '2020-08-10'),
+('Rent, bills, etc', 'EXPENSE_CATEGORY', 'Utilities', 'A', '2020-08-10', '2020-08-10'),
+('Food from Restaurants or Home deliveries', 'EXPENSE_CATEGORY', 'RestaurantFood', 'A', '2020-08-10', '2020-08-10'),
+('Junk food at home/office', 'EXPENSE_CATEGORY', 'Snacks', 'A', '2020-08-10', '2020-08-10'),
+('Medicines, medical related', 'EXPENSE_CATEGORY', 'Health&Medical', 'A', '2020-08-10', '2020-08-10'),
+('All transportations', 'EXPENSE_CATEGORY', 'Transportation', 'A', '2020-08-10', '2020-08-10'),
+('Debt repayments', 'EXPENSE_CATEGORY', 'DebtRepay', 'A', '2020-08-10', '2020-08-10'),
+('Daily need items at home/office', 'EXPENSE_CATEGORY', 'DailyNeeds', 'A', '2020-08-10', '2020-08-10'),
+('Investments/ Savings', 'EXPENSE_CATEGORY', 'Investment', 'A', '2020-08-10', '2020-08-10'),
+('On/With friends', 'EXPENSE_CATEGORY', 'Friends', 'A', '2020-08-10', '2020-08-10'),
+('Insurances for self/family', 'EXPENSE_CATEGORY', 'Insurance', 'A', '2020-08-10', '2020-08-10'),
+('Any unexpected/ unexplainable', 'EXPENSE_CATEGORY', 'Other', 'A', '2020-08-10', '2020-08-10');
+

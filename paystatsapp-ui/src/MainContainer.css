@@ -1,0 +1,38 @@
+.heading-border{
+    border-style: solid !important;
+    border-width:  0px 0px 3px 0px !important;
+}
+
+.img-add{
+    width: 26px !important;
+    height: 26px !important;
+}
+
+.img-icon{
+    width: 28px !important;
+    height: 28px !important;
+    cursor: pointer;
+}
+
+.img-icon-small{
+    width: 19px !important;
+    height: 19px !important;
+    cursor: pointer;
+}
+
+.middle-align{
+    vertical-align: middle;
+}
+
+.text-size-large{
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.show-pointer{
+    cursor: pointer;
+}
+
+
+
+
