@@ -1,7 +1,9 @@
 package com.bipullohia.paystats.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bipullohia.paystats.helper.CSVHelper;
 import com.bipullohia.paystats.model.PaymentVO;
+import com.bipullohia.paystats.model.PaymentsReviewVO;
 import com.bipullohia.paystats.model.SyncInfoVO;
 import com.bipullohia.paystats.service.PaymentService;
 
@@ -112,6 +115,78 @@ public class PaymentController {
 		syncInfo.setListOfPaymentErrorRows(listOfErrorRows);
 		System.out.println("Rows inserted: " + insertedRowCount);
 		return new ResponseEntity<SyncInfoVO>(syncInfo, HttpStatus.OK);
+	}
+	
+	@GetMapping("/generateReviewReport")
+	public ResponseEntity<TreeMap<String, PaymentsReviewVO>> generateExpenseReport(){
+		//retrieve all the payments from the PAYMENT table
+		List<PaymentVO> payments = paymentService.getAllPayment();
+		HashMap<String, PaymentsReviewVO> reviewMap = new HashMap<>();
+		reviewMap = getPaymentReviewHashmap(payments);
+		
+		TreeMap<String, PaymentsReviewVO> sortedMap = new TreeMap<>();
+		sortedMap.putAll(reviewMap);
+		
+		return new ResponseEntity<>(sortedMap, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("/testEndpoint")
+	public ResponseEntity<String> testFunction(){
+		
+		System.out.println("Hello World! This is a test endpoint for experiments");
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+	
+	private HashMap<String, PaymentsReviewVO> getPaymentReviewHashmap(List<PaymentVO> payments){
+		//The root map containing all the month's reports
+		HashMap<String, PaymentsReviewVO> reviewMap = new HashMap<>();
+		
+		if(payments.size() > 0) {
+			PaymentsReviewVO payReviewVO = new PaymentsReviewVO();
+			//This map corresponds to a particular month's report
+			HashMap<String, Integer> map = new HashMap<>();
+			
+			for(int i=0; i<payments.size(); i++) {
+				String currentMonth = getMonth(payments.get(i).getTransactionDate());
+				String currentYear = getYear(payments.get(i).getTransactionDate());
+				String currentMapKey = currentYear+currentMonth;
+
+				//if root hashmap is not there for the month, create one
+				if(!reviewMap.containsKey(currentMapKey)) {
+					payReviewVO = new PaymentsReviewVO();
+					map = new HashMap<>();
+					payReviewVO.setCategoryDetails(map);
+					reviewMap.put(currentMapKey, payReviewVO);
+				}
+				
+				map = reviewMap.get(currentMapKey).getCategoryDetails();
+				String category = payments.get(i).getCategory().toString();
+				
+				//If this category doesn't exist in the map, we initiate it with 0				
+				if(!map.containsKey(category)) {
+					map.put(category, 0);
+				}
+				
+				int amount = map.get(category);
+				int finalAmount = amount + payments.get(i).getAmount();
+				map.put(category, finalAmount);
+				
+				//setting the updated map back to the root map
+				reviewMap.get(currentMapKey).setCategoryDetails(map);
+			}
+		}
+		return reviewMap;
+	}
+	
+	private String getMonth(String date) {
+		String month = date.substring(3, 5);
+		return month;
+	}
+	
+	private String getYear(String date) {
+		String year = date.substring(6);
+		return year;
 	}
 	
 	

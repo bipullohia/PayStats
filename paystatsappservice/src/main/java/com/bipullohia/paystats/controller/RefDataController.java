@@ -47,7 +47,7 @@ public class RefDataController {
 		return resp;
 	}
 	
-	//sync the data on the sheet with the db table (right now it just pushes the payment rows to the DB table)
+	//sync the data on the sheet with the db table (right now it just pushes the rows to the DB table)
 	@GetMapping("/syncSheetToDB")
 	public ResponseEntity<SyncInfoVO> syncSheetValuestoDB(@RequestParam("sheetName") String sheetName) {
 		CSVHelper csvHelper = new CSVHelper();
