@@ -3,6 +3,7 @@ package com.bipullohia.paystats.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class PaymentController {
 	@Autowired
 	private PaymentService paymentService;
 	
-	//TO get all the payments on the DB table
+	//To get all the payments on the DB table
 	@GetMapping("/all")
 	public ResponseEntity<List<PaymentVO>> getAllPayments(){
 		return new ResponseEntity<List<PaymentVO>>(paymentService.getAllPayment(),HttpStatus.OK);
@@ -116,20 +117,37 @@ public class PaymentController {
 		System.out.println("Rows inserted: " + insertedRowCount);
 		return new ResponseEntity<SyncInfoVO>(syncInfo, HttpStatus.OK);
 	}
-	
-	@GetMapping("/generateReviewReport")
-	public ResponseEntity<TreeMap<String, PaymentsReviewVO>> generateExpenseReport(){
+
+	//generate a report for every month's expenses based on the categories
+	@GetMapping("/generateMonthlyReport")
+	public ResponseEntity<TreeMap<String, PaymentsReviewVO>> generateMonthlyReport(){
 		//retrieve all the payments from the PAYMENT table
 		List<PaymentVO> payments = paymentService.getAllPayment();
 		HashMap<String, PaymentsReviewVO> reviewMap = new HashMap<>();
 		reviewMap = getPaymentReviewHashmap(payments);
 		
-		TreeMap<String, PaymentsReviewVO> sortedMap = new TreeMap<>();
-		sortedMap.putAll(reviewMap);
+		TreeMap<String, PaymentsReviewVO> monthlySortedMap = new TreeMap<>();
+		monthlySortedMap.putAll(reviewMap);
 		
-		return new ResponseEntity<>(sortedMap, HttpStatus.OK);
+		return new ResponseEntity<>(monthlySortedMap, HttpStatus.OK);
 	}
 	
+	//generate a report for every year's expenses based on the categories
+	@GetMapping("/generateYearlyReport")
+	public ResponseEntity<TreeMap<String, PaymentsReviewVO>> generateYearlyReport(){
+		//retrieve all the payments from the PAYMENT table
+		List<PaymentVO> payments = paymentService.getAllPayment();
+		HashMap<String, PaymentsReviewVO> reviewMap = new HashMap<>();
+		reviewMap = getPaymentReviewHashmap(payments);
+		
+		TreeMap<String, PaymentsReviewVO> monthlySortedMap = new TreeMap<>();
+		monthlySortedMap.putAll(reviewMap);
+		
+		TreeMap<String, PaymentsReviewVO> yearlySortedMap = new TreeMap<>();
+		yearlySortedMap = generateYearlyReport(monthlySortedMap);
+		
+		return new ResponseEntity<>(yearlySortedMap, HttpStatus.OK);
+	}
 	
 	@GetMapping("/testEndpoint")
 	public ResponseEntity<String> testFunction(){
@@ -137,6 +155,7 @@ public class PaymentController {
 		System.out.println("Hello World! This is a test endpoint for experiments");
 		return new ResponseEntity<>(null, HttpStatus.OK);
 	}
+	
 	
 	private HashMap<String, PaymentsReviewVO> getPaymentReviewHashmap(List<PaymentVO> payments){
 		//The root map containing all the month's reports
@@ -179,6 +198,44 @@ public class PaymentController {
 		return reviewMap;
 	}
 	
+	private TreeMap<String, PaymentsReviewVO> generateYearlyReport(TreeMap<String, PaymentsReviewVO> hashmap) {
+		
+		TreeMap<String, PaymentsReviewVO> yearlyReport = new TreeMap<>();
+		PaymentsReviewVO reviewVO = null;
+		String[] years = {"2018","2019","2020"};
+		
+		//iterating through the years
+		for(String year: years) {
+			reviewVO = new PaymentsReviewVO();
+			
+			//main map containing category-wise records for entire year
+			HashMap<String, Integer> categoryMap = new HashMap<>();;
+			
+			//iterating through each month of the year
+			for(Map.Entry<String, PaymentsReviewVO> entry : hashmap.entrySet()) {
+				
+				if(entry.getKey().substring(0, 4).equalsIgnoreCase(year)) {
+					//map for the monthly record for all the category
+					HashMap<String, Integer> monthlyMap = new HashMap<>();
+					monthlyMap = entry.getValue().getCategoryDetails();
+					
+					for(Map.Entry<String, Integer> category: monthlyMap.entrySet()) {
+						if(!categoryMap.containsKey(category.getKey())) {
+							categoryMap.put(category.getKey(), 0);
+						}
+						int existingAmount = categoryMap.get(category.getKey());
+						int finalAmount = existingAmount + category.getValue();
+						
+						categoryMap.put(category.getKey(), finalAmount);
+					}
+				}
+			}
+			reviewVO.setCategoryDetails(categoryMap);
+			yearlyReport.put(year, reviewVO);
+		}
+		return yearlyReport;
+	}
+	
 	private String getMonth(String date) {
 		String month = date.substring(3, 5);
 		return month;
@@ -188,6 +245,4 @@ public class PaymentController {
 		String year = date.substring(6);
 		return year;
 	}
-	
-	
 }
